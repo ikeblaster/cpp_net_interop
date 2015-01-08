@@ -1,5 +1,5 @@
 @echo off
-call "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat"
+call ..\__vcvars.bat
 
 if not exist "%~dp1mono.lib" lib /nologo /def:mono.def /out:mono.lib /machine:x86
 
