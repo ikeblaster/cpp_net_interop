@@ -252,6 +252,7 @@ class YahooAPI {
             if (FAILED(hr))
             {
                 wprintf(L"SafeArrayPutElement failed w/hr 0x%08lx\n", hr);
+                SafeArrayDestroy(psaArgs);
                 return 0;
             }
                 
@@ -260,8 +261,11 @@ class YahooAPI {
             if (FAILED(hr))
             {
                 wprintf(L"Failed to invoke GetBid w/hr 0x%08lx\n", hr);
+                SafeArrayDestroy(psaArgs);
                 return 0;
             }
+            
+            SafeArrayDestroy(psaArgs);
 
             return vtRet.dblVal;
         }      
@@ -280,6 +284,7 @@ class YahooAPI {
             if (FAILED(hr))
             {
                 wprintf(L"SafeArrayPutElement failed w/hr 0x%08lx\n", hr);
+                SafeArrayDestroy(psaArgs);
                 return 0;
             }
                 
@@ -288,8 +293,11 @@ class YahooAPI {
             if (FAILED(hr))
             {
                 wprintf(L"Failed to invoke GetAsk w/hr 0x%08lx\n", hr);
+                SafeArrayDestroy(psaArgs);
                 return 0;
             }
+            
+            SafeArrayDestroy(psaArgs);
 
             return vtRet.dblVal;
         }
@@ -315,6 +323,7 @@ class YahooAPI {
             if (FAILED(hr))
             {
                 wprintf(L"Failed to invoke test w/hr 0x%08lx\n", hr);
+                SafeArrayDestroy(psaArgs);
                 return NULL;
             }
 
