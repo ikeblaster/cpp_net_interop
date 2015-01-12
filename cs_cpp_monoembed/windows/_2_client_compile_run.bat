@@ -1,5 +1,5 @@
 @echo off
-call ..\__vcvars.bat
+call ..\..\__vcvars.bat
 
 if not exist "%~dp1mono.lib" lib /nologo /def:mono.def /out:mono.lib /machine:x86
 
