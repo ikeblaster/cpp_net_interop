@@ -22,8 +22,8 @@ int main()
 
         cout << "MSFT stocks" << endl;
 
-        // cout << "Ask: " << api->GetAsk("MSFT") << endl;
-        // cout << "Bid: " << api->GetBid("MSFT") << endl;
+        cout << "Ask: " << api->GetAsk("MSFT") << endl;
+        cout << "Bid: " << api->GetBid("MSFT") << endl;
 
     }
     CoUninitialize();
