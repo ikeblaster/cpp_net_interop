@@ -7,7 +7,8 @@ using namespace std;
 
 
 void PrintCB(System::String^ str) {
-    cout << (const char*) Marshal::StringToHGlobalAnsi(str).ToPointer() << endl << endl;
+    cout << msclr::interop::marshal_as<std::string>(str).c_str() << endl << endl;
+    // cout << (const char*) Marshal::StringToHGlobalAnsi(str).ToPointer() << endl << endl;
 }
  
 int main()
