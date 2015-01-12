@@ -4,7 +4,6 @@
 
 class YahooAPIWrapperPrivate;
 
- 
 class _LNK YahooAPIWrapper
 {
     private:
