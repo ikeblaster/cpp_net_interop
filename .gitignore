@@ -19,6 +19,11 @@
 *.a
 *.lib
 
+*.exp
+*.tlb
+*.tlh
+*.tli
+
 # Executables
 *.exe
 *.out
