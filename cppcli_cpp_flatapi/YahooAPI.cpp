@@ -61,12 +61,12 @@ YahooAPI::~YahooAPI()
  
 double YahooAPI::GetBid(const char* symbol)
 {
-    return _private->yahooAPI->ParseDouble(_private->yahooAPI->GetDataFromYahoo(gcnew System::String(symbol), "b3")[0]);
+    return _private->yahooAPI->ParseDouble(_private->yahooAPI->GetDataFromYahoo(gcnew System::String(symbol), "b")[0]);
 }
 
 double YahooAPI::GetAsk(const char* symbol)
 {
-    return _private->yahooAPI->ParseDouble(_private->yahooAPI->GetDataFromYahoo(gcnew System::String(symbol), "b2")[0]);
+    return _private->yahooAPI->ParseDouble(_private->yahooAPI->GetDataFromYahoo(gcnew System::String(symbol), "a")[0]);
 }
 
 const char* YahooAPI::GetCapitalization(const char* symbol)

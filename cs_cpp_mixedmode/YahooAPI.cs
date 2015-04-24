@@ -32,12 +32,12 @@ public class YahooAPI
  
     public double GetBid(string symbol)
     {
-        return ParseDouble(GetDataFromYahoo(symbol, "b3")[0]);
+        return ParseDouble(GetDataFromYahoo(symbol, "b")[0]);
     }
  
     public double GetAsk(string symbol)
     {
-        return ParseDouble(GetDataFromYahoo(symbol, "b2")[0]);
+        return ParseDouble(GetDataFromYahoo(symbol, "a")[0]);
     }
  
     public string GetCapitalization(string symbol)

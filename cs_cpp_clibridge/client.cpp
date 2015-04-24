@@ -16,6 +16,12 @@ int main()
     YahooAPIWrapper::test("C++/CLI bridge", &PrintCB);
 
     cout << "MSFT stocks" << endl;
+    
+    const char** vals = api->GetValues("MSFT", "abcde");
+    
+    for(int i=0; i<5; i++) {
+        cout << vals[i] << endl;
+    }
 
     // cout << "Ask: " << api->GetAsk("MSFT") << endl;
     // cout << "Bid: " << api->GetBid("MSFT") << endl;
