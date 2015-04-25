@@ -42,10 +42,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="WrapperILDelegateGenerator.cs" />
     <Compile Include="IEnumerableExtension.cs" />
     <Compile Include="WrapperMockupGenerator.cs" />
     <Compile Include="WrapperProjectGenerator.cs" />
-    <Compile Include="WrapperILBridgesGenerator.cs" />
+    <Compile Include="WrapperILBridgeGenerator.cs" />
     <Compile Include="FixedTreeView.cs">
       <SubType>Component</SubType>
     </Compile>

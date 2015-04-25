@@ -1,21 +1,20 @@
 using System;
-using System.IO;
-using System.Text;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 
 namespace ManagedToNativeWrapperGenerator
 {
     public abstract class TypeGenerator
     {
-        private List<string> generatedFiles = new List<string>();
-        protected String outputFolder;
+        private List<string> GeneratedFiles = new List<string>();
+        protected String OutputFolder;
 
 
 
         protected TypeGenerator(String outputFolder) 
         {
-            this.outputFolder = outputFolder;
+            this.OutputFolder = outputFolder;
         }
 
         public virtual void AssemblyLoad(Assembly assembly)
@@ -41,16 +40,16 @@ namespace ManagedToNativeWrapperGenerator
 
         public List<string> GetGeneratedFiles()
         {
-            return this.generatedFiles;
+            return this.GeneratedFiles;
         }
 
         protected void WriteToFile(String text, String filename)
         {
-            StreamWriter sw = new StreamWriter(Path.Combine(outputFolder, filename));
+            StreamWriter sw = new StreamWriter(Path.Combine(this.OutputFolder, filename));
             sw.Write(text);
             sw.Close();
 
-            this.generatedFiles.Add(filename);
+            this.GeneratedFiles.Add(filename);
         }
 
 

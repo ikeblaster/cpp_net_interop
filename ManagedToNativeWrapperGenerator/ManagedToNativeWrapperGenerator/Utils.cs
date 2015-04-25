@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Reflection.Emit;
 
 namespace ManagedToNativeWrapperGenerator
 {
@@ -11,7 +10,7 @@ namespace ManagedToNativeWrapperGenerator
         [Flags]
         public enum TFlag
         {
-            none = 0,
+            None = 0,
             MarshalingRequired = 1,
             MarshalingInContext = 2,
             WrapperRequired = 4,
@@ -31,66 +30,65 @@ namespace ManagedToNativeWrapperGenerator
             private readonly bool _ilObject;
 
 
-            public TypeTranslation(Type managedType, string nativeType, TFlag ti = TFlag.none)
+            public TypeTranslation(Type managedType, string nativeType, TFlag ti = TFlag.None)
             {
-                _managedType = managedType;
-                _nativeType = nativeType;
-                _marshalingRequired = ti.HasFlag(TFlag.MarshalingRequired);
-                _marshalingInContext = ti.HasFlag(TFlag.MarshalingInContext);
-                _wrapperRequired = ti.HasFlag(TFlag.WrapperRequired);
-                _castRequired = ti.HasFlag(TFlag.CastRequired);
-                _ilObject = ti.HasFlag(TFlag.ILObject);
+                this._managedType = managedType;
+                this._nativeType = nativeType;
+                this._marshalingRequired = ti.HasFlag(TFlag.MarshalingRequired);
+                this._marshalingInContext = ti.HasFlag(TFlag.MarshalingInContext);
+                this._wrapperRequired = ti.HasFlag(TFlag.WrapperRequired);
+                this._castRequired = ti.HasFlag(TFlag.CastRequired);
+                this._ilObject = ti.HasFlag(TFlag.ILObject);
 
-                if (_nativeType == null) _nativeType = Utils.GetWrapperTypeFullNameFor(managedType) + "*";
-                if (_wrapperRequired) _ilbridgeType = Utils.GetWrapperILBridgeTypeFullNameFor(managedType) + "*";
+                if (this._nativeType == null) this._nativeType = Utils.GetWrapperTypeFullNameFor(managedType) + "*";
+                if (this._wrapperRequired) this._ilbridgeType = Utils.GetWrapperILBridgeTypeFullNameFor(managedType) + "*";
             }
 
-            public TypeTranslation(Type managedType, TFlag ti = TFlag.none)
+            public TypeTranslation(Type managedType, TFlag ti = TFlag.None)
                 : this(managedType, null, ti)
             {
                 
             }
 
 
-
             public Type ManagedType
             {
-                get { return _managedType; }
+                get { return this._managedType; }
             }
 
             public string NativeType
             {
-                get { return _nativeType; }
+                get { return this._nativeType; }
             }
 
             public string ILBridgeType
             {
-                get { return _ilbridgeType; }
+                get { return this._ilbridgeType; }
             }
 
-            public bool isMarshalingRequired
+            public bool IsMarshalingRequired
             {
-                get { return _marshalingRequired; }
+                get { return this._marshalingRequired; }
             }
 
-            public bool isMarshalingInContext
+            public bool IsMarshalingInContext
             {
-                get { return _marshalingInContext; }
+                get { return this._marshalingInContext; }
             }
 
-            public bool isWrapperRequired
+            public bool IsWrapperRequired
             {
-                get { return _wrapperRequired; }
+                get { return this._wrapperRequired; }
             }
 
-            public bool isCastRequired
+            public bool IsCastRequired
             {
-                get { return _castRequired; }
+                get { return this._castRequired; }
             }
 
-            public bool isILObject
+            public bool IsILObject
             {
-                get { return _ilObject; }
+                get { return this._ilObject; }
             }
 
         }
@@ -153,25 +151,25 @@ namespace ManagedToNativeWrapperGenerator
                 }
             }
 
-            //TODO: Try more things, like collections
-            //TODO: Convert structures recursively?
+            // TODO: Try more things, like collections
+            // TODO: Convert structures recursively?
 
-            // Objects
-            if (!parameterType.IsValueType)
+            // Enums
+            if (parameterType.IsEnum)
             {
-                return new TypeTranslation(parameterType, TFlag.MarshalingRequired | TFlag.WrapperRequired | TFlag.ILObject);
+                return new TypeTranslation(parameterType, Utils.GetWrapperTypeFullNameFor(parameterType), TFlag.CastRequired | TFlag.WrapperRequired);
             }
 
-            // e.g. Enum values
-            return new TypeTranslation(parameterType, Utils.GetWrapperTypeFullNameFor(parameterType), TFlag.CastRequired | TFlag.WrapperRequired);
+            // Objects
+            return new TypeTranslation(parameterType, TFlag.MarshalingRequired | TFlag.WrapperRequired | TFlag.ILObject);
         }
     }
 
     public static class Utils
     {
-        public static string GetCppCliTypeNameFor(Type type)
+        public static string GetCppCliTypeFullNameFor(Type type)
         {
-            return type.FullName.Replace(".", "::").Replace("+","::");
+            return "::" + type.FullName.Replace(".", "::").Replace("+","::");
         }
 
         public static string GetCppCliNamespaceFor(Type type)
@@ -182,8 +180,8 @@ namespace ManagedToNativeWrapperGenerator
 
         public static string GetCppCliNamespacePrefixFor(Type type)
         {
-            string ns = GetCppCliNamespaceFor(type);
-            return ns.Length == 0 ? ns : ns + "::";
+            if (type.Namespace == null) return "";
+            return GetCppCliNamespaceFor(type) + "::";
         }
 
 
@@ -200,7 +198,7 @@ namespace ManagedToNativeWrapperGenerator
             }
             else 
             {
-                bestEffort = GetCppCliTypeNameFor(type);
+                bestEffort = GetCppCliTypeFullNameFor(type);
             }
 
             if (!type.IsValueType)
@@ -237,7 +235,7 @@ namespace ManagedToNativeWrapperGenerator
 
         public static string GetWrapperTypeNameFor(Type type)
         {
-            return "Wrapper_" + type.Name.Replace('.', '_');
+            return type.Name.Replace('.', '_');
         }
 
         public static string GetWrapperILBridgeTypeNameFor(Type type)
@@ -249,14 +247,22 @@ namespace ManagedToNativeWrapperGenerator
 
         public static string GetWrapperTypeFullNameFor(Type type)
         {
-            return GetCppCliNamespacePrefixFor(type) + GetWrapperTypeNameFor(type);
+            return GetWrapperProjectName() + "::" + GetCppCliNamespacePrefixFor(type) + GetWrapperTypeNameFor(type);
         }
 
         public static string GetWrapperILBridgeTypeFullNameFor(Type type)
         {
-            return GetCppCliNamespacePrefixFor(type) + GetWrapperILBridgeTypeNameFor(type);
+            return GetWrapperProjectName() + "::" + GetCppCliNamespacePrefixFor(type) + GetWrapperILBridgeTypeNameFor(type);
         }
 
 
+        public static string GetWrapperFileNameFor(Type type)
+        {
+            return GetWrapperProjectName() + "_" + GetWrapperTypeNameFor(type);
+        }
+        public static string GetWrapperILBridgeFileNameFor(Type type)
+        {
+            return GetWrapperProjectName() + "_" + GetWrapperILBridgeTypeNameFor(type);
+        }
     }
 }

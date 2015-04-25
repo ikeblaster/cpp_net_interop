@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
-using System.Collections.Generic;
 
 namespace ManagedToNativeWrapperGenerator
 {
@@ -13,11 +14,11 @@ namespace ManagedToNativeWrapperGenerator
         {
             InitializeComponent();
             this.textBoxOutputFolder.Text = @"c:\Users\Uzivatel\Documents\GitHub\cpp_net_interop\ManagedToNativeWrapperGenerator\TestDir\output\";
-            this.addAssembly(@"c:\Users\Uzivatel\Documents\GitHub\cpp_net_interop\ManagedToNativeWrapperGenerator\TestDir\Arrays.dll");
+            AddAssembly(@"c:\Users\Uzivatel\Documents\GitHub\cpp_net_interop\ManagedToNativeWrapperGenerator\TestDir\Arrays.dll");
         }
 
 
-        private void addAssembly(String file)
+        private void AddAssembly(String file)
         {
             Assembly assembly;
             try
@@ -40,15 +41,20 @@ namespace ManagedToNativeWrapperGenerator
 
             foreach (var type in types)
             {
-                if (type.IsClass) this.addAssembly_class(nodeAssembly, type);
-                else if (type.IsEnum) this.addAssembly_enum(nodeAssembly, type);                                                   
+                if (type.IsEnum)
+                    AddAssembly_enum(nodeAssembly, type);
+                else
+                    AddAssembly_class(nodeAssembly, type);
             }    
 
         }
 
-        private void addAssembly_class(TreeNode nodeAssembly, Type type)
+        private void AddAssembly_class(TreeNode nodeAssembly, Type type)
         {
-            TreeNode nodeType = new TreeNode() { Text = type.FullName, ImageKey = "Class.png", SelectedImageKey = "Class.png", Tag = type };
+            string img = "Class.png";
+            if (!type.IsClass) img = "Struct.png";
+
+            TreeNode nodeType = new TreeNode() { Text = type.FullName, ImageKey = img, SelectedImageKey = img, Tag = type };
             nodeAssembly.Nodes.Add(nodeType);
 
             var ctors = type.GetConstructors().OrderBy(m => m.Attributes);
@@ -77,7 +83,7 @@ namespace ManagedToNativeWrapperGenerator
 
             foreach (var field in fields)
             {
-                String img = "Field.png";
+                img = "Field.png";
                 if (field.IsStatic) img = "FieldStatic.png";
 
                 nodeType.Nodes.Add(new TreeNode()
@@ -102,7 +108,7 @@ namespace ManagedToNativeWrapperGenerator
             {
                 if (method.DeclaringType != type) continue; // TODO: checkbox ?
 
-                String img = "Method.png";
+                img = "Method.png";
                 if (method.IsStatic) img = "MethodStatic.png";
                 else if (method.IsSpecialName) img = "Field.png";
 
@@ -111,7 +117,7 @@ namespace ManagedToNativeWrapperGenerator
                 {
                     Text = method.Name
                             + "("
-                            + string.Join(", ", method.GetParameters().Select(par => par.ParameterType.Name + " " + par.Name).ToArray())
+                            + String.Join(", ", method.GetParameters().Select(par => par.ParameterType.Name + " " + par.Name).ToArray())
                             + ") : "
                             + method.ReturnType.Name,
 
@@ -125,7 +131,7 @@ namespace ManagedToNativeWrapperGenerator
 
         }
 
-        private void addAssembly_enum(TreeNode nodeAssembly, Type type)
+        private void AddAssembly_enum(TreeNode nodeAssembly, Type type)
         {
             TreeNode nodeType = new TreeNode() { Text = type.FullName, ImageKey = "Enum.png", SelectedImageKey = "Enum.png", Tag = type };
             nodeAssembly.Nodes.Add(nodeType);
@@ -173,17 +179,17 @@ namespace ManagedToNativeWrapperGenerator
                 String method = e.Node.Text.Substring(0, begin);
                 String past = e.Node.Text.Substring(begin);
 
-                Size s = TextRenderer.MeasureText(e.Graphics, method, Font, e.Bounds.Size, flags);
+                Size s = TextRenderer.MeasureText(e.Graphics, method, this.Font, e.Bounds.Size, flags);
 
                 Rectangle pos = e.Bounds;
                 pos.Offset(s.Width - 7, 0);
 
-                TextRenderer.DrawText(e.Graphics, method, Font, e.Bounds, color, flags);
-                TextRenderer.DrawText(e.Graphics, past, Font, pos, color2, flags);
+                TextRenderer.DrawText(e.Graphics, method, this.Font, e.Bounds, color, flags);
+                TextRenderer.DrawText(e.Graphics, past, this.Font, pos, color2, flags);
             }
             else
             {                              
-                TextRenderer.DrawText(e.Graphics, e.Node.Text, Font, e.Bounds, color, flags);
+                TextRenderer.DrawText(e.Graphics, e.Node.Text, this.Font, e.Bounds, color, flags);
             }
         }
 
@@ -221,8 +227,24 @@ namespace ManagedToNativeWrapperGenerator
 
                 e.Node.Parent.Checked = checkRoot;
             } 
-
         }
+
+        private void treeViewAssemblies_DragEnter(object sender, DragEventArgs e)
+        {
+            e.Effect = DragDropEffects.Copy;
+        }
+
+        private void treeViewAssemblies_DragDrop(object sender, DragEventArgs e)
+        {
+            string[] files = e.Data.GetData(DataFormats.FileDrop) as string[];
+            foreach (string file in files)
+            {
+                if (!File.Exists(file)) continue;
+                AddAssembly(file);
+            }
+        }
+
+
 
         #endregion
 
@@ -236,15 +258,15 @@ namespace ManagedToNativeWrapperGenerator
 
             foreach (var file in this.openFileDialog1.FileNames)
             {
-                this.addAssembly(file);
+                AddAssembly(file);
             }
         }
 
         private void buttonRemoveAssembly_Click(object sender, EventArgs e)
         {
-            if (treeViewAssemblies.SelectedNode.Parent == null)
+            if (this.treeViewAssemblies.SelectedNode.Parent == null)
             {
-                treeViewAssemblies.SelectedNode.Remove();
+                this.treeViewAssemblies.SelectedNode.Remove();
             }
         }
 
@@ -258,15 +280,28 @@ namespace ManagedToNativeWrapperGenerator
 
         private void buttonGenerate_Click(object sender, EventArgs e)
         {
-            List<TypeGenerator> generatorChain = new List<TypeGenerator>();
+            
+            try
+            {
+            	Directory.CreateDirectory(this.textBoxOutputFolder.Text);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("The output folder path is invalid.");
+                return;
+            }
+
+
+            var generatorChain = new List<TypeGenerator>();
 
             generatorChain.Add(new WrapperMockupGenerator(this.textBoxOutputFolder.Text, generatorChain)); // fixes missing files
             generatorChain.Add(new WrapperHeaderGenerator(this.textBoxOutputFolder.Text));
             generatorChain.Add(new WrapperSourceGenerator(this.textBoxOutputFolder.Text));
-            generatorChain.Add(new WrapperILBridgesGenerator(this.textBoxOutputFolder.Text));
+            generatorChain.Add(new WrapperILBridgeGenerator(this.textBoxOutputFolder.Text));
+            generatorChain.Add(new WrapperILDelegateGenerator(this.textBoxOutputFolder.Text));
             generatorChain.Add(new WrapperProjectGenerator(this.textBoxOutputFolder.Text, generatorChain));
 
-            foreach (TreeNode nodeAssembly in treeViewAssemblies.Nodes)
+            foreach (TreeNode nodeAssembly in this.treeViewAssemblies.Nodes)
             {
                 if (!nodeAssembly.Checked) continue;
 
@@ -279,7 +314,15 @@ namespace ManagedToNativeWrapperGenerator
 
                     var type = (Type) nodeType.Tag;
 
-                    if (type.IsClass)
+                    if (type.IsEnum)
+                    {
+                        var chcked = nodeType.Nodes.OfType<TreeNode>().Where(n => n.Checked);
+                        var fields = chcked.Where(n => n.Tag is FieldInfo).Select(n => n.Tag).Cast<FieldInfo>().ToArray();
+
+                        // call EnumLoad
+                        generatorChain.ForEach(g => g.EnumLoad(type, fields));
+                    }
+                    else
                     {
                         var chcked = nodeType.Nodes.OfType<TreeNode>().Where(n => n.Checked);
 
@@ -289,15 +332,6 @@ namespace ManagedToNativeWrapperGenerator
 
                         // call ClassLoad
                         generatorChain.ForEach(g => g.ClassLoad(type, fields, ctors, methods));
-
-                    }
-                    else if (type.IsEnum)
-                    {
-                        var chcked = nodeType.Nodes.OfType<TreeNode>().Where(n => n.Checked);
-                        var fields = chcked.Where(n => n.Tag is FieldInfo).Select(n => n.Tag).Cast<FieldInfo>().ToArray();
-
-                        // call EnumLoad
-                        generatorChain.ForEach(g => g.EnumLoad(type, fields));
                     }
                 }   
 
@@ -312,6 +346,7 @@ namespace ManagedToNativeWrapperGenerator
         }
 
         #endregion
+
 
 
     }

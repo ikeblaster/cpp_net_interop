@@ -1,11 +1,14 @@
-﻿namespace ManagedToNativeWrapperGenerator
+﻿using System.ComponentModel;
+using System.Windows.Forms;
+
+namespace ManagedToNativeWrapperGenerator
 {
     partial class Form1
     {
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -45,9 +48,9 @@
             // buttonAddAssembly
             // 
             this.buttonAddAssembly.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonAddAssembly.Location = new System.Drawing.Point(473, 12);
+            this.buttonAddAssembly.Location = new System.Drawing.Point(611, 12);
             this.buttonAddAssembly.Name = "buttonAddAssembly";
-            this.buttonAddAssembly.Size = new System.Drawing.Size(109, 23);
+            this.buttonAddAssembly.Size = new System.Drawing.Size(115, 23);
             this.buttonAddAssembly.TabIndex = 1;
             this.buttonAddAssembly.Text = "Add assembly";
             this.buttonAddAssembly.UseVisualStyleBackColor = true;
@@ -56,7 +59,7 @@
             // buttonRemoveAssembly
             // 
             this.buttonRemoveAssembly.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonRemoveAssembly.Location = new System.Drawing.Point(588, 12);
+            this.buttonRemoveAssembly.Location = new System.Drawing.Point(611, 41);
             this.buttonRemoveAssembly.Name = "buttonRemoveAssembly";
             this.buttonRemoveAssembly.Size = new System.Drawing.Size(115, 23);
             this.buttonRemoveAssembly.TabIndex = 2;
@@ -67,7 +70,7 @@
             // buttonGenerate
             // 
             this.buttonGenerate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonGenerate.Location = new System.Drawing.Point(473, 383);
+            this.buttonGenerate.Location = new System.Drawing.Point(611, 469);
             this.buttonGenerate.Name = "buttonGenerate";
             this.buttonGenerate.Size = new System.Drawing.Size(115, 23);
             this.buttonGenerate.TabIndex = 3;
@@ -77,9 +80,9 @@
             // 
             // label1
             // 
-            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(470, 52);
+            this.label1.Location = new System.Drawing.Point(12, 455);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(71, 13);
             this.label1.TabIndex = 4;
@@ -87,18 +90,19 @@
             // 
             // textBoxOutputFolder
             // 
-            this.textBoxOutputFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBoxOutputFolder.Location = new System.Drawing.Point(473, 68);
+            this.textBoxOutputFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxOutputFolder.Location = new System.Drawing.Point(12, 471);
             this.textBoxOutputFolder.Name = "textBoxOutputFolder";
-            this.textBoxOutputFolder.Size = new System.Drawing.Size(167, 20);
+            this.textBoxOutputFolder.Size = new System.Drawing.Size(530, 20);
             this.textBoxOutputFolder.TabIndex = 5;
             // 
             // buttonOutputFolderBrowse
             // 
-            this.buttonOutputFolderBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonOutputFolderBrowse.Location = new System.Drawing.Point(646, 67);
+            this.buttonOutputFolderBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonOutputFolderBrowse.Location = new System.Drawing.Point(548, 469);
             this.buttonOutputFolderBrowse.Name = "buttonOutputFolderBrowse";
-            this.buttonOutputFolderBrowse.Size = new System.Drawing.Size(57, 21);
+            this.buttonOutputFolderBrowse.Size = new System.Drawing.Size(57, 23);
             this.buttonOutputFolderBrowse.TabIndex = 6;
             this.buttonOutputFolderBrowse.Text = "Browse";
             this.buttonOutputFolderBrowse.UseVisualStyleBackColor = true;
@@ -130,6 +134,7 @@
             // 
             // treeViewAssemblies
             // 
+            this.treeViewAssemblies.AllowDrop = true;
             this.treeViewAssemblies.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -137,20 +142,22 @@
             this.treeViewAssemblies.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawText;
             this.treeViewAssemblies.ImageIndex = 0;
             this.treeViewAssemblies.ImageList = this.imageList1;
-            this.treeViewAssemblies.Location = new System.Drawing.Point(13, 13);
+            this.treeViewAssemblies.Location = new System.Drawing.Point(12, 13);
             this.treeViewAssemblies.Name = "treeViewAssemblies";
             this.treeViewAssemblies.SelectedImageIndex = 0;
             this.treeViewAssemblies.ShowNodeToolTips = true;
-            this.treeViewAssemblies.Size = new System.Drawing.Size(451, 393);
+            this.treeViewAssemblies.Size = new System.Drawing.Size(593, 435);
             this.treeViewAssemblies.TabIndex = 7;
             this.treeViewAssemblies.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.treeViewAssemblies_AfterCheck);
             this.treeViewAssemblies.DrawNode += new System.Windows.Forms.DrawTreeNodeEventHandler(this.treeViewAssemblies_DrawNode);
+            this.treeViewAssemblies.DragDrop += new System.Windows.Forms.DragEventHandler(this.treeViewAssemblies_DragDrop);
+            this.treeViewAssemblies.DragEnter += new System.Windows.Forms.DragEventHandler(this.treeViewAssemblies_DragEnter);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(715, 418);
+            this.ClientSize = new System.Drawing.Size(738, 504);
             this.Controls.Add(this.treeViewAssemblies);
             this.Controls.Add(this.buttonOutputFolderBrowse);
             this.Controls.Add(this.textBoxOutputFolder);
@@ -168,15 +175,15 @@
 
         #endregion
 
-        private System.Windows.Forms.Button buttonAddAssembly;
-        private System.Windows.Forms.Button buttonRemoveAssembly;
-        private System.Windows.Forms.Button buttonGenerate;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox textBoxOutputFolder;
-        private System.Windows.Forms.Button buttonOutputFolderBrowse;
-        private System.Windows.Forms.ImageList imageList1;
-        private System.Windows.Forms.OpenFileDialog openFileDialog1;
-        private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
+        private Button buttonAddAssembly;
+        private Button buttonRemoveAssembly;
+        private Button buttonGenerate;
+        private Label label1;
+        private TextBox textBoxOutputFolder;
+        private Button buttonOutputFolderBrowse;
+        private ImageList imageList1;
+        private OpenFileDialog openFileDialog1;
+        private FolderBrowserDialog folderBrowserDialog1;
         private FixedTreeView treeViewAssemblies;
 
     }

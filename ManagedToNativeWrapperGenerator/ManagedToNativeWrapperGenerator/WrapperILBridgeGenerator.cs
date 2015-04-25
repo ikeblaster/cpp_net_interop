@@ -1,26 +1,22 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.IO;
 
 namespace ManagedToNativeWrapperGenerator
 {
-    public class WrapperILBridgesGenerator : TypeGenerator
+    public class WrapperILBridgeGenerator : TypeGenerator
     {
+        private readonly bool usesMarshalContext = false;
 
-
-        public WrapperILBridgesGenerator(String outputFolder)
+        public WrapperILBridgeGenerator(string outputFolder)
             : base(outputFolder)
         {
-
         }
-
 
         public override void EnumLoad(Type type, FieldInfo[] fields)
         {
-            StringBuilder builder = new StringBuilder();
+            var builder = new StringBuilder();
 
             // This is a managed only h ilbridge file.
             builder.AppendLine("#pragma once");
@@ -29,14 +25,15 @@ namespace ManagedToNativeWrapperGenerator
             builder.AppendLine("#include \"" + WrapperHeaderGenerator.GetFileName(type) + "\"");
             builder.AppendLine();
 
-            this.WriteToFile(builder.ToString(), GetFileName(type));
+            WriteToFile(builder.ToString(), GetFileName(type));
         }
-
-
 
         public override void ClassLoad(Type type, FieldInfo[] fields, ConstructorInfo[] ctors, MethodInfo[] methods)
         {
-            StringBuilder builder = new StringBuilder();
+            if (typeof(MulticastDelegate).IsAssignableFrom(type))
+                return;
+
+            var builder = new StringBuilder();
 
             // This is a managed only h ilbridge file.
             builder.AppendLine("#pragma once");
@@ -47,37 +44,39 @@ namespace ManagedToNativeWrapperGenerator
 
             builder.AppendLine("#using \"" + type.Module.Name + "\"");
             builder.AppendLine("#include \"" + WrapperHeaderGenerator.GetFileName(type) + "\"");
-
             builder.AppendLine();
 
             WrapperSourceGenerator.GenerateNamespaces(type, builder);
-
             GenerateILBridgeClass(type, builder);
-
             WrapperSourceGenerator.GenerateEndNamespaces(type, builder);
 
             GenerateMarshalExtension(type, builder);
 
-            this.WriteToFile(builder.ToString(), GetFileName(type));
+            WriteToFile(builder.ToString(), GetFileName(type));
         }
 
-        private bool usesMarshalContext = false;
-
-
+        #region Helpers
 
         private void GenerateILBridgeClass(Type type, StringBuilder builder)
         {
             builder.AppendLine("class " + Utils.GetWrapperILBridgeTypeNameFor(type) + " {");
             builder.AppendLine("\tpublic:");
-            builder.AppendLine("\t\tmsclr::auto_gcroot<" + Utils.GetCppCliTypeNameFor(type) + "^> __Impl;");
-            if(usesMarshalContext) builder.AppendLine("\t\tmsclr::auto_gcroot<marshal_context^> __Context;");
+
+            if (type.IsValueType) 
+                builder.AppendLine("\t\t" + Utils.GetCppCliTypeFullNameFor(type) + " __Impl;");
+            else 
+                builder.AppendLine("\t\tmsclr::auto_gcroot<" + Utils.GetCppCliTypeFullNameFor(type) + "^> __Impl;");
+
+            if (this.usesMarshalContext) 
+                builder.AppendLine("\t\tmsclr::auto_gcroot<marshal_context^> __Context;");
+
             builder.AppendLine("};");
         }
 
 
         private void GenerateMarshalExtension(Type type, StringBuilder builder)
         {
-            TypeConverter.TypeTranslation retValTransl = TypeConverter.TranslateParameterType(type);
+            var retValTransl = TypeConverter.TranslateParameterType(type);
 
             builder.AppendLine();
             builder.AppendLine("template <typename TTo> ");
@@ -93,20 +92,26 @@ namespace ManagedToNativeWrapperGenerator
             builder.AppendLine("template <typename TTo> ");
             builder.AppendLine("inline " + Utils.GetCppCliTypeFor(type) + " marshal_as(" + retValTransl.NativeType + " const from)");
             builder.AppendLine("{");
-            builder.AppendLine("\treturn from->__IL->__Impl.get();;");
+            if (type.IsValueType)
+                builder.AppendLine("\treturn from->__IL->__Impl;");
+            else
+                builder.AppendLine("\treturn from->__IL->__Impl.get();");
             builder.AppendLine("}");
         }
 
 
+        #endregion
+
+
+
         public static string GetFileName(Type type)
         {
-            return Utils.GetWrapperILBridgeTypeNameFor(type) + ".h";
+            return Utils.GetWrapperILBridgeFileNameFor(type) + ".h";
         }
 
         public override string GetFileNameFor(Type type)
         {
             return GetFileName(type);
         }
-
     }
 }

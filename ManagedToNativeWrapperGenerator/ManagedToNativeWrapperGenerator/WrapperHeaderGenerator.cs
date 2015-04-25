@@ -1,24 +1,22 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace ManagedToNativeWrapperGenerator
 {
     public class WrapperHeaderGenerator : TypeGenerator
     {
-        public WrapperHeaderGenerator(String outputFolder)
+        private HashSet<Type> declaredClasses;
+        private StringBuilder outClass;
+        private StringBuilder outHeader;
+
+        public WrapperHeaderGenerator(string outputFolder)
             : base(outputFolder)
         {
-
         }
-
-
-        StringBuilder outHeader;
-        StringBuilder outClass;
-
-        HashSet<Type> declaredClasses;
 
         public override void EnumLoad(Type type, FieldInfo[] fields)
         {
@@ -31,12 +29,12 @@ namespace ManagedToNativeWrapperGenerator
             this.outHeader.AppendLine("#pragma once");
             this.outHeader.AppendLine();
 
-            this.GenerateEnum(type, fields);
+            GenerateEnum(type, fields);
 
             // append class text to header
-            this.outHeader.Append(this.outClass.ToString());
+            this.outHeader.Append(this.outClass);
 
-            this.WriteToFile(this.outHeader.ToString(), GetFileName(type));
+            WriteToFile(this.outHeader.ToString(), GetFileName(type));
         }
 
         #region EnumValues generator
@@ -47,9 +45,9 @@ namespace ManagedToNativeWrapperGenerator
 
             this.outClass.AppendLine("enum " + Utils.GetWrapperTypeNameFor(type) + " {"); // Wrapper enum
 
-            var strFields = fields.Select(f => f.Name + " = " + Convert.ChangeType(f.GetValue(null), typeof(ulong))).ToArray();
-            this.outClass.AppendLine("\t" + String.Join("," + Environment.NewLine + "\t", strFields));
- 
+            var strFields = fields.Select(f => f.Name + " = " + Convert.ChangeType(f.GetValue(null), typeof (ulong))).ToArray();
+            this.outClass.AppendLine("\t" + string.Join("," + Environment.NewLine + "\t", strFields));
+
             this.outClass.AppendLine("};");
 
 
@@ -58,10 +56,11 @@ namespace ManagedToNativeWrapperGenerator
 
         #endregion
 
-
-
         public override void ClassLoad(Type type, FieldInfo[] fields, ConstructorInfo[] ctors, MethodInfo[] methods)
         {
+            if (typeof(MulticastDelegate).IsAssignableFrom(type))
+                return;
+
             this.outHeader = new StringBuilder();
             this.outClass = new StringBuilder();
 
@@ -78,21 +77,20 @@ namespace ManagedToNativeWrapperGenerator
             this.outHeader.AppendLine();
 
 
-            this.GenerateClass(type);
+            GenerateClass(type);
 
-            this.GenerateCtors(type, ctors);
+            GenerateCtors(type, ctors);
 
-            this.GenerateFields(type, fields);
+            GenerateFields(type, fields);
 
-            this.GenerateMethods(type, methods);
+            GenerateMethods(type, methods);
 
-            this.GenerateEndClass(type);
-
+            GenerateEndClass(type);
 
             // append class text to header
-            this.outHeader.Append(this.outClass.ToString());
+            this.outHeader.Append(this.outClass);
 
-            this.WriteToFile(this.outHeader.ToString(), GetFileName(type));
+            WriteToFile(this.outHeader.ToString(), GetFileName(type));
         }
 
 
@@ -120,20 +118,24 @@ namespace ManagedToNativeWrapperGenerator
 
         #endregion
 
-
         #region Ctors/dctors generators
 
         private void GenerateCtors(Type type, ConstructorInfo[] ctors)
         {
-            string className = Utils.GetWrapperTypeNameFor(type);
+            var className = Utils.GetWrapperTypeNameFor(type);
 
-            foreach (ConstructorInfo ctor in ctors)
+            foreach (var ctor in ctors)
             {
                 if (ctor.DeclaringType == type)
                 {
                     GenerateCtor(ctor, this.outClass);
                     this.outClass.AppendLine();
                 }
+            }
+
+            if (type.IsValueType && ctors.Length == 0)
+            {
+                this.outClass.AppendLine("\t\t" + className + "();"); // empty constructor
             }
 
             this.outClass.AppendLine("\t\t" + className + "(" + Utils.GetWrapperILBridgeTypeNameFor(type) + "* IL);"); // IL constructor
@@ -144,35 +146,22 @@ namespace ManagedToNativeWrapperGenerator
         private void GenerateCtor(ConstructorInfo ctor, StringBuilder builder)
         {
             // generate method parameters
-            List<string> parList = new List<string>();
-
-            foreach (ParameterInfo parameter in ctor.GetParameters())
-            {
-                // translate parameter
-                TypeConverter.TypeTranslation parTypeTransl = TypeConverter.TranslateParameterType(parameter.ParameterType);
-                if (parTypeTransl.isWrapperRequired)
-                {
-                    this.GenerateWrapperDeclaration(parTypeTransl.ManagedType, this.outHeader);
-                }
-
-                parList.Add(parTypeTransl.NativeType + " " + parameter.Name);
-                WrapperSourceGenerator.GenerateArrayLengthParameters(parameter.Name, parameter.ParameterType, parList, WrapperSourceGenerator.GenParametersType.Parameter); // generate parameters for parameter-array lengths (if array used)
-            }
+            var parList = new List<string>();
+            GenerateParametersList(ctor.GetParameters(), ref parList);
 
             builder.Append("\t\t");
             builder.Append(Utils.GetWrapperTypeNameFor(ctor.DeclaringType) + "("); // method name
-            builder.Append(String.Join(", ", parList));
+            builder.Append(string.Join(", ", parList));
             builder.AppendLine(");");
         }
 
         #endregion
 
-
         #region Fields generator
 
         private void GenerateFields(Type type, FieldInfo[] fields)
         {
-            foreach (FieldInfo field in fields)
+            foreach (var field in fields)
             {
                 if (field.DeclaringType == type)
                 {
@@ -185,31 +174,31 @@ namespace ManagedToNativeWrapperGenerator
         private void GenerateField(FieldInfo field, StringBuilder builder)
         {
             // translate return type
-            TypeConverter.TypeTranslation typeTransl = TypeConverter.TranslateParameterType(field.FieldType);
-            if (typeTransl.isWrapperRequired)
+            var typeTransl = TypeConverter.TranslateParameterType(field.FieldType);
+            if (typeTransl.IsWrapperRequired)
             {
-                this.GenerateWrapperDeclaration(typeTransl.ManagedType, this.outHeader);
+                GenerateWrapperDeclaration(typeTransl.ManagedType, this.outHeader);
             }
 
             // GETTER
             {
-                List<string> parList = new List<string>();
-                WrapperSourceGenerator.GenerateArrayLengthParameters(Utils.GetLocalTempNameForReturn(), field.FieldType, parList, WrapperSourceGenerator.GenParametersType.OutParameter);
+                var parList = new List<string>();
+                WrapperSourceGenerator.GenerateArrayLengthParameters(Utils.GetLocalTempNameForReturn(), field.FieldType, ref parList, WrapperSourceGenerator.GenParametersType.OutParameter);
 
                 builder.Append("\t\t");
 
                 if (field.IsStatic) builder.Append("static "); // static keyword
                 builder.Append(typeTransl.NativeType + " get_" + field.Name + "(");
-                builder.Append(String.Join(", ", parList));
+                builder.Append(string.Join(", ", parList));
                 builder.AppendLine(");");
             }
 
             // SETTER
             if (!field.IsInitOnly)
             {
-                List<string> parList = new List<string>();
+                var parList = new List<string>();
                 parList.Add(typeTransl.NativeType + " value");
-                WrapperSourceGenerator.GenerateArrayLengthParameters("value", field.FieldType, parList, WrapperSourceGenerator.GenParametersType.OutParameter);
+                WrapperSourceGenerator.GenerateArrayLengthParameters("value", field.FieldType, ref parList, WrapperSourceGenerator.GenParametersType.OutParameter);
 
 
                 builder.AppendLine();
@@ -217,19 +206,18 @@ namespace ManagedToNativeWrapperGenerator
 
                 if (field.IsStatic) builder.Append("static "); // static keyword
                 builder.Append("void set_" + field.Name + "(");
-                builder.Append(String.Join(", ", parList));
+                builder.Append(string.Join(", ", parList));
                 builder.AppendLine(");");
             }
         }
 
         #endregion
 
-
         #region Methods generator
 
         private void GenerateMethods(Type type, MethodInfo[] methods)
         {
-            foreach (MethodInfo method in methods)
+            foreach (var method in methods)
             {
                 if (method.DeclaringType == type)
                 {
@@ -239,49 +227,71 @@ namespace ManagedToNativeWrapperGenerator
             }
         }
 
-
-
         private void GenerateMethod(MethodInfo method, StringBuilder builder)
         {
             // translate return type
-            TypeConverter.TypeTranslation returnTypeTransl = TypeConverter.TranslateParameterType(method.ReturnType);
-            if (returnTypeTransl.isWrapperRequired)
+            var returnTypeTransl = TypeConverter.TranslateParameterType(method.ReturnType);
+            if (returnTypeTransl.IsWrapperRequired)
             {
-                this.GenerateWrapperDeclaration(returnTypeTransl.ManagedType, this.outHeader);
+                GenerateWrapperDeclaration(returnTypeTransl.ManagedType, this.outHeader);
             }
-
 
             // generate method parameters
-            List<string> parList = new List<string>();
+            var parList = new List<string>();
+            GenerateParametersList(method.GetParameters(), ref parList);
 
-            foreach (ParameterInfo parameter in method.GetParameters())
-            {
-                // translate parameter
-                TypeConverter.TypeTranslation parTypeTransl = TypeConverter.TranslateParameterType(parameter.ParameterType);
-                if (parTypeTransl.isWrapperRequired)
-                {
-                    this.GenerateWrapperDeclaration(parTypeTransl.ManagedType, this.outHeader);
-                }
-
-                parList.Add(parTypeTransl.NativeType + " " + parameter.Name);
-                WrapperSourceGenerator.GenerateArrayLengthParameters(parameter.Name, parameter.ParameterType, parList, WrapperSourceGenerator.GenParametersType.Parameter); // generate parameters for parameter-array lengths (if array used)
-            }
             // generate parameters for returnval-array lengths (if array used)
-            WrapperSourceGenerator.GenerateArrayLengthParameters(Utils.GetLocalTempNameForReturn(), method.ReturnType, parList, WrapperSourceGenerator.GenParametersType.OutParameter);
+            WrapperSourceGenerator.GenerateArrayLengthParameters(Utils.GetLocalTempNameForReturn(), method.ReturnType, ref parList, WrapperSourceGenerator.GenParametersType.OutParameter);
 
 
             builder.Append("\t\t");
 
             if (method.IsStatic) builder.Append("static "); // static keyword
             builder.Append(returnTypeTransl.NativeType + " " + method.Name + "("); // method name
-            builder.Append(String.Join(", ", parList));
+            builder.Append(string.Join(", ", parList));
             builder.AppendLine(");");
         }
 
+        #endregion
+
+        #region Helpers
+
+        private void GenerateParametersList(ParameterInfo[] parameters, ref List<string> parList)
+        {
+            foreach (var parameter in parameters)
+            {
+                if (typeof (MulticastDelegate).IsAssignableFrom(parameter.ParameterType))
+                {
+                    var method = parameter.ParameterType.GetMethod("Invoke");
+                    var delegateParList = new List<string>();
+
+                    var retTypeTransl = TypeConverter.TranslateParameterType(method.ReturnType);
+                    if (retTypeTransl.IsWrapperRequired)
+                    {
+                        GenerateWrapperDeclaration(retTypeTransl.ManagedType, this.outHeader);
+                    }
+
+                    GenerateParametersList(method.GetParameters(), ref delegateParList);
+
+                    parList.Add(retTypeTransl.NativeType + " (*" + parameter.Name + ")(" + string.Join(", ", delegateParList) + ")");
+                }                          
+                else
+                {
+                    var parTypeTransl = TypeConverter.TranslateParameterType(parameter.ParameterType);
+                    if (parTypeTransl.IsWrapperRequired)
+                    {
+                        GenerateWrapperDeclaration(parTypeTransl.ManagedType, this.outHeader);
+                    }
+
+                    parList.Add(parTypeTransl.NativeType + " " + parameter.Name);
+                    WrapperSourceGenerator.GenerateArrayLengthParameters(parameter.Name, parameter.ParameterType, ref parList, WrapperSourceGenerator.GenParametersType.Parameter);
+                }
+            }
+        }
 
         private void GenerateWrapperDeclaration(Type type, StringBuilder builder)
         {
-            Type t = type;
+            var t = type;
             if (t.IsArray && t.HasElementType)
             {
                 t = t.GetElementType();
@@ -291,8 +301,10 @@ namespace ManagedToNativeWrapperGenerator
 
             WrapperSourceGenerator.GenerateNamespaces(t, builder);
 
-            if(t.IsClass) builder.AppendLine("class " + Utils.GetWrapperTypeNameFor(t) + ";");
-            else if (t.IsEnum) builder.AppendLine("enum " + Utils.GetWrapperTypeNameFor(t) + ";"); 
+            if (t.IsEnum)
+                builder.AppendLine("enum " + Utils.GetWrapperTypeNameFor(t) + ";");
+            else
+                builder.AppendLine("class " + Utils.GetWrapperTypeNameFor(t) + ";");
 
             WrapperSourceGenerator.GenerateEndNamespaces(t, builder);
             builder.AppendLine();
@@ -307,15 +319,12 @@ namespace ManagedToNativeWrapperGenerator
 
         public static string GetFileName(Type type)
         {
-            return Utils.GetWrapperTypeNameFor(type) + ".h";
+            return Utils.GetWrapperFileNameFor(type) + ".h";
         }
 
         public override string GetFileNameFor(Type type)
         {
             return GetFileName(type);
         }
-
-
     }
-
 }

@@ -1,37 +1,34 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Reflection;
 using System.Text;
-using System.IO;
+using System.Windows.Forms;
+using ManagedToNativeWrapperGenerator.Properties;
 
 namespace ManagedToNativeWrapperGenerator
 {
     public class WrapperProjectGenerator : TypeGenerator
     {
+        private readonly List<TypeGenerator> generatorChain;
+        private readonly HashSet<Assembly> loadedAssemblies = new HashSet<Assembly>();
 
-        List<TypeGenerator> generatorChain;
-        HashSet<Assembly> loadedAssemblies = new HashSet<Assembly>();
-
-
-        public WrapperProjectGenerator(String outputFolder, List<TypeGenerator> generatorChain)
+        public WrapperProjectGenerator(string outputFolder, List<TypeGenerator> generatorChain)
             : base(outputFolder)
         {
             this.generatorChain = generatorChain;
         }
 
-
         public override void AssemblyLoad(Assembly assembly)
         {
-            loadedAssemblies.Add(assembly);
+            this.loadedAssemblies.Add(assembly);
         }
-
 
         public override void GeneratorFinalize()
         {
-            StringBuilder builder = new StringBuilder();
-            List<string> filesCpp = new List<string>();
-            List<string> filesH = new List<string>();
+            var builder = new StringBuilder();
+            var filesCpp = new List<string>();
+            var filesH = new List<string>();
 
             foreach (var gen in this.generatorChain)
             {
@@ -40,7 +37,7 @@ namespace ManagedToNativeWrapperGenerator
             }
 
             builder.AppendLine(
-@"<?xml version=""1.0"" encoding=""utf-8""?>
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
 <Project DefaultTargets=""Build"" ToolsVersion=""4.0"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
   <ItemGroup>
     <ProjectConfiguration Include=""Debug|Win32"">
@@ -69,7 +66,7 @@ namespace ManagedToNativeWrapperGenerator
             }
 
             builder.AppendLine(
-@"  </ItemGroup>
+                @"  </ItemGroup>
   <ItemGroup>");
 
             foreach (var file in filesH)
@@ -79,41 +76,44 @@ namespace ManagedToNativeWrapperGenerator
             }
 
             builder.AppendLine(
-@"  </ItemGroup>
+                @"  </ItemGroup>
   <ItemGroup>");
 
             foreach (var assembly in this.loadedAssemblies)
             {
                 builder.AppendFormat(
-@"    <Reference Include=""{0}"">
+                    @"    <Reference Include=""{0}"">
       <HintPath>{1}</HintPath>
     </Reference>", assembly.FullName, assembly.ManifestModule.Name);
                 builder.AppendLine();
             }
 
             builder.AppendLine(
-@"  </ItemGroup>
+                @"  </ItemGroup>
   <Import Project=""$(VCTargetsPath)\Microsoft.Cpp.Targets"" />
 </Project>");
 
 
-            
 
-            this.WriteToFile(builder.ToString(), GetFileName());
+
+            WriteToFile(builder.ToString(), GetFileName());
 
             // TODO: checkbox, copy assemblies
             foreach (var assembly in this.loadedAssemblies)
             {
-                File.Copy(assembly.Location, Path.Combine(outputFolder, assembly.ManifestModule.Name), true);
+                string outFile = Path.Combine(this.OutputFolder, assembly.ManifestModule.Name);
+
+                if(File.Exists(assembly.Location) && !File.Exists(outFile))
+                    File.Copy(assembly.Location, outFile, true);
             }
 
             try
             {
-                File.WriteAllText(Path.Combine(outputFolder, "marshaler_ext.h"), ManagedToNativeWrapperGenerator.Properties.Resources.marshaler_ext);
+                File.WriteAllText(Path.Combine(this.OutputFolder, "marshaler_ext.h"), Resources.marshaler_ext);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                System.Windows.Forms.MessageBox.Show(ex.Message);     	
+                MessageBox.Show(ex.Message);
             }
         }
 
@@ -127,6 +127,5 @@ namespace ManagedToNativeWrapperGenerator
         {
             return GetFileName();
         }
-
     }
 }

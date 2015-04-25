@@ -1,25 +1,20 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Collections.Generic;
 
 namespace ManagedToNativeWrapperGenerator
 {
     public class WrapperMockupGenerator : TypeGenerator
     {
+        private readonly List<TypeGenerator> GeneratorChain;
+        private readonly Dictionary<Type, bool> UsedTypes = new Dictionary<Type, bool>();
 
-        List<TypeGenerator> generatorChain;
-
-        Dictionary<Type, bool> usedTypes = new Dictionary<Type, bool>();
-
-
-        public WrapperMockupGenerator(String outputFolder, List<TypeGenerator> generatorChain)
+        public WrapperMockupGenerator(string outputFolder, List<TypeGenerator> generatorChain)
             : base(outputFolder)
         {
-            this.generatorChain = generatorChain;
+            this.GeneratorChain = generatorChain;
         }
-
 
         public override void AssemblyLoad(Assembly assembly)
         {
@@ -31,43 +26,50 @@ namespace ManagedToNativeWrapperGenerator
 
         public override void ClassLoad(Type type, FieldInfo[] fields, ConstructorInfo[] ctors, MethodInfo[] methods)
         {
-            this.addUsedType(type, true);
+            AddUsedType(type, true);
 
-            fields.ForEach(f => this.addUsedType(f.FieldType, false));
+            fields.ForEach(f => AddUsedType(f.FieldType, false));
 
-            ctors.SelectMany(c => c.GetParameters()).ForEach(p => this.addUsedType(p.ParameterType, false));
+            ctors.SelectMany(c => c.GetParameters()).ForEach(p => AddUsedType(p.ParameterType, false));
 
-            methods.ForEach(m => this.addUsedType(m.ReturnType, false));
-            methods.SelectMany(c => c.GetParameters()).ForEach(p => this.addUsedType(p.ParameterType, false));
+            methods.ForEach(m => AddUsedType(m.ReturnType, false));
+            methods.SelectMany(c => c.GetParameters()).ForEach(p => AddUsedType(p.ParameterType, false));
         }
 
-
-        private void addUsedType(Type type, bool declared)
+        private void AddUsedType(Type type, bool declared)
         {
-            Type t = type;
-            if (t.IsArray && t.HasElementType)
+            if (typeof (MulticastDelegate).IsAssignableFrom(type))
             {
-                t = t.GetElementType();
+                var method = type.GetMethod("Invoke");
+                AddUsedType(method.ReturnType, declared);
+                method.GetParameters().ForEach(p => AddUsedType(p.ParameterType, declared));
             }
 
-            TypeConverter.TypeTranslation trans = TypeConverter.TranslateParameterType(t);
+            if (type.HasElementType)
+            {
+                AddUsedType(type.GetElementType(), declared);
+                return;
+            }
 
+            if (type.IsArray)
+                return;
 
-            if (trans.isWrapperRequired && !this.usedTypes.ContainsKey(t))
-                this.usedTypes.Add(t, false);
+            var trans = TypeConverter.TranslateParameterType(type);
 
-            if (declared) this.usedTypes[t] = true;
+            if (trans.IsWrapperRequired && !this.UsedTypes.ContainsKey(type))
+                this.UsedTypes.Add(type, false);
+
+            if (declared) this.UsedTypes[type] = true;
         }
-
 
         public override void GeneratorFinalize()
         {
-            var notFound = this.usedTypes.Where(t => !t.Value).Select(t => t.Key).Cast<Type>();
-            var chain = this.generatorChain.Where(f => f != this);
+            var notFound = this.UsedTypes.Where(t => !t.Value).Select(t => t.Key);
+            var chain = this.GeneratorChain.Where(f => f != this);
 
-            var empFields = new FieldInfo[] { };
-            var empCtors = new ConstructorInfo[] { };
-            var empMethods = new MethodInfo[] { };
+            var empFields = new FieldInfo[] {};
+            var empCtors = new ConstructorInfo[] {};
+            var empMethods = new MethodInfo[] {};
 
             foreach (var type in notFound)
             {
@@ -75,21 +77,21 @@ namespace ManagedToNativeWrapperGenerator
                 {
                     gen.AssemblyLoad(type.Assembly);
 
-                    if (type.IsClass) gen.ClassLoad(type, empFields, empCtors, empMethods);
-                    else if (type.IsEnum) gen.EnumLoad(type, type.GetFields(BindingFlags.Public | BindingFlags.Static));
-                }    
-            }
+                    if (type.IsEnum)
+                        gen.EnumLoad(type, type.GetFields(BindingFlags.Public | BindingFlags.Static));
+                    else if (type.IsClass)
+                        gen.ClassLoad(type, empFields, empCtors, empMethods);
+                    else
+                        gen.ClassLoad(type, type.GetFields(BindingFlags.Public | BindingFlags.Static), empCtors, empMethods); // structs
+                }
+            } 
+
+            // TODO: recursive?
         }
-
-
-
 
         public override string GetFileNameFor(Type type)
         {
             return null;
         }
-
-
     }
-
 }
