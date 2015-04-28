@@ -49,6 +49,8 @@ namespace ManagedToNativeWrapperGenerator
 
         private void GenerateILBridgeDelegate(Type type, StringBuilder builder)
         {
+            // TODO: Refactor
+
             var method = type.GetMethod("Invoke");
             var nativeParList = new List<string>();
 
@@ -128,7 +130,6 @@ namespace ManagedToNativeWrapperGenerator
                     }
 
                     parList.Add(parTypeTransl.NativeType + " " + parameter.Name);
-                    WrapperSourceGenerator.GenerateArrayLengthParameters(parameter.Name, parameter.ParameterType, ref parList, WrapperSourceGenerator.GenParametersType.Parameter);
                 }
             }
         }

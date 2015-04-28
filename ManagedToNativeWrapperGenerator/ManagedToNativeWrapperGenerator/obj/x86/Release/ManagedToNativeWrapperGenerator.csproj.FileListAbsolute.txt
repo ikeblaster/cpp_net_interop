@@ -1,1 +1,0 @@
-C:\Users\Uzivatel\Documents\GitHub\cpp_net_interop\ManagedToNativeWrapperGenerator\ManagedToNativeWrapperGenerator\bin\Release\ManagedToNativeWrapperGenerator.exe.config

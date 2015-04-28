@@ -69,6 +69,7 @@ namespace ManagedToNativeWrapperGenerator
 
             this.outHeader.AppendLine("#pragma once");
             this.outHeader.AppendLine("#include <string>");
+            this.outHeader.AppendLine("#include <vector>");
             this.outHeader.AppendLine();
 
             this.outHeader.AppendLine("#ifndef _LNK");
@@ -182,32 +183,20 @@ namespace ManagedToNativeWrapperGenerator
 
             // GETTER
             {
-                var parList = new List<string>();
-                WrapperSourceGenerator.GenerateArrayLengthParameters(Utils.GetLocalTempNameForReturn(), field.FieldType, ref parList, WrapperSourceGenerator.GenParametersType.OutParameter);
-
                 builder.Append("\t\t");
 
                 if (field.IsStatic) builder.Append("static "); // static keyword
-                builder.Append(typeTransl.NativeType + " get_" + field.Name + "(");
-                builder.Append(string.Join(", ", parList));
-                builder.AppendLine(");");
+                builder.AppendLine(typeTransl.NativeType + " get_" + field.Name + "();");
             }
 
             // SETTER
             if (!field.IsInitOnly)
             {
-                var parList = new List<string>();
-                parList.Add(typeTransl.NativeType + " value");
-                WrapperSourceGenerator.GenerateArrayLengthParameters("value", field.FieldType, ref parList, WrapperSourceGenerator.GenParametersType.OutParameter);
-
-
                 builder.AppendLine();
                 builder.Append("\t\t");
 
                 if (field.IsStatic) builder.Append("static "); // static keyword
-                builder.Append("void set_" + field.Name + "(");
-                builder.Append(string.Join(", ", parList));
-                builder.AppendLine(");");
+                builder.AppendLine("void set_" + field.Name + "(" + typeTransl.NativeType + " value);");
             }
         }
 
@@ -239,10 +228,6 @@ namespace ManagedToNativeWrapperGenerator
             // generate method parameters
             var parList = new List<string>();
             GenerateParametersList(method.GetParameters(), ref parList);
-
-            // generate parameters for returnval-array lengths (if array used)
-            WrapperSourceGenerator.GenerateArrayLengthParameters(Utils.GetLocalTempNameForReturn(), method.ReturnType, ref parList, WrapperSourceGenerator.GenParametersType.OutParameter);
-
 
             builder.Append("\t\t");
 
@@ -284,7 +269,6 @@ namespace ManagedToNativeWrapperGenerator
                     }
 
                     parList.Add(parTypeTransl.NativeType + " " + parameter.Name);
-                    WrapperSourceGenerator.GenerateArrayLengthParameters(parameter.Name, parameter.ParameterType, ref parList, WrapperSourceGenerator.GenParametersType.Parameter);
                 }
             }
         }

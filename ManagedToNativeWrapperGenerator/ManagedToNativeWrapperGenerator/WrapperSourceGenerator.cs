@@ -72,7 +72,8 @@ namespace ManagedToNativeWrapperGenerator
                 }
             }
 
-            if (type.IsValueType && ctors.Length == 0)
+            // contrustor for valuetype classes (used for struct wrappers)
+            if (type != null && type.IsValueType && ctors.Length == 0)
             {
                 this.outClass.AppendLine(className + "::" + className + "() {");
                 this.outClass.AppendLine("\t__IL = new " + Utils.GetWrapperILBridgeTypeNameFor(type) + ";");
@@ -81,13 +82,14 @@ namespace ManagedToNativeWrapperGenerator
                 this.outClass.AppendLine();
             }
 
+            // constructor for generated objects
             this.outClass.AppendLine(className + "::" + className + "(" + Utils.GetWrapperILBridgeTypeNameFor(type) + "* IL) {");
             this.outClass.AppendLine("\t__IL = IL;");
             if (this.usesMarshalContext) this.outClass.AppendLine("\t__IL->__Context = gcnew marshal_context;");
             this.outClass.AppendLine("}");
-
             this.outClass.AppendLine();
 
+            // destructor
             this.outClass.AppendLine(className + "::~" + className + "() {");
             this.outClass.AppendLine("\tdelete __IL;");
             this.outClass.AppendLine("}");
@@ -95,15 +97,16 @@ namespace ManagedToNativeWrapperGenerator
 
         private void GenerateCtor(ConstructorInfo ctor, StringBuilder builder)
         {
-            // generate method parameters
+            // generate ctor parameters
             var parList = new List<string>();
             GenerateParametersList(ctor.GetParameters(), ref parList);
 
-
             var className = Utils.GetWrapperTypeNameFor(ctor.DeclaringType);
 
+            // signature
             builder.AppendLine(className + "::" + className + "(" + string.Join(", ", parList) + ") {");
 
+            // body
             foreach (var parameter in ctor.GetParameters())
             {
                 GenerateMarshalParameter(parameter.Name, parameter.ParameterType, builder);
@@ -111,7 +114,7 @@ namespace ManagedToNativeWrapperGenerator
 
             builder.AppendLine("\t__IL = new " + Utils.GetWrapperILBridgeTypeNameFor(ctor.DeclaringType) + ";");
             builder.Append("\t__IL->__Impl = gcnew " + Utils.GetCppCliTypeFullNameFor(ctor.DeclaringType) + "(");
-            builder.Append(string.Join(", ", ctor.GetParameters().Select(par => Utils.GetLocalTempNameFor(par)).ToArray()));
+            builder.Append(string.Join(", ", ctor.GetParameters().Select(par => Utils.GetLocalTempNameFor(par))));
             builder.AppendLine(");");
 
             if (this.usesMarshalContext) builder.AppendLine("\t__IL->__Context = gcnew marshal_context;");
@@ -145,13 +148,8 @@ namespace ManagedToNativeWrapperGenerator
 
             // GETTER
             {
-                var parList = new List<string>();
-                GenerateArrayLengthParameters(Utils.GetLocalTempNameForReturn(), field.FieldType, ref parList, GenParametersType.OutParameter);
-
                 // signature
-                builder.Append(typeTransl.NativeType + " " + Utils.GetWrapperTypeNameFor(field.DeclaringType) + "::get_" + field.Name + "(");
-                builder.Append(string.Join(", ", parList));
-                builder.AppendLine(") {");
+                builder.AppendLine(typeTransl.NativeType + " " + Utils.GetWrapperTypeNameFor(field.DeclaringType) + "::get_" + field.Name + "() {");
 
                 // body
                 builder.Append("\t");
@@ -166,9 +164,7 @@ namespace ManagedToNativeWrapperGenerator
 
                 builder.AppendLine(field.Name + ";");
 
-
-                GenerateReturnLengthAssignments(field.FieldType, builder);
-
+                // return value
                 GenerateReturnVal(field.FieldType, ref typeTransl, builder);
 
                 builder.AppendLine("}");
@@ -177,14 +173,10 @@ namespace ManagedToNativeWrapperGenerator
             // SETTER
             if (!field.IsInitOnly)
             {
-                var parList = new List<string>();
-                parList.Add(typeTransl.NativeType + " value");
-                GenerateArrayLengthParameters("value", field.FieldType, ref parList, GenParametersType.OutParameter);
+                builder.AppendLine();
 
                 // signature
-                builder.Append("void " + Utils.GetWrapperTypeNameFor(field.DeclaringType) + "::set_" + field.Name + "(");
-                builder.Append(string.Join(", ", parList));
-                builder.AppendLine(") {");
+                builder.AppendLine("void " + Utils.GetWrapperTypeNameFor(field.DeclaringType) + "::set_" + field.Name + "(" + typeTransl.NativeType + " value) {");
 
                 // body
                 GenerateMarshalParameter("value", field.FieldType, builder);
@@ -238,8 +230,6 @@ namespace ManagedToNativeWrapperGenerator
 
             GenerateMethod_CallManaged(method, builder);
 
-            GenerateReturnLengthAssignments(method.ReturnType, builder);
-
             GenerateReturnVal(method.ReturnType, ref retValTransl, builder);
 
             builder.AppendLine("}");
@@ -254,7 +244,6 @@ namespace ManagedToNativeWrapperGenerator
 
             // METHOD PARAMETERS
             GenerateParametersList(method.GetParameters(), ref parList);
-            GenerateArrayLengthParameters(Utils.GetLocalTempNameForReturn(), method.ReturnType, ref parList, GenParametersType.OutParameter);
 
             builder.Append(string.Join(", ", parList));
             builder.Append(") ");
@@ -311,43 +300,7 @@ namespace ManagedToNativeWrapperGenerator
             NameOnly
         };
 
-        public static void GenerateArrayLengthParameters(string name, Type parameterType, ref List<string> parList, GenParametersType genType)
-        {
-            var type = "";
-
-            switch (genType)
-            {
-                case GenParametersType.Parameter:
-                    type = "size_t ";
-                    break;
-                case GenParametersType.OutParameter:
-                    type = "size_t& ";
-                    break;
-            }
-
-            if (parameterType.IsArray)
-            {
-                // Multidimensional array
-                if (parameterType.GetArrayRank() > 1)
-                {
-                    for (var i = 0; i < parameterType.GetArrayRank(); i++)
-                    {
-                        parList.Add(type + name + "_len" + i);
-                    }
-                }
-                else // Jagged arrays
-                {
-                    var elementType = parameterType;
-                    var i = 0;
-
-                    while (elementType.IsArray && elementType.HasElementType)
-                    {
-                        elementType = elementType.GetElementType();
-                        parList.Add(type + name + "_len" + (i++));
-                    }
-                }
-            }
-        }
+        
 
         public static void GenerateMarshalParameter(string parameterName, Type parameterType, StringBuilder builder)
         {
@@ -360,18 +313,10 @@ namespace ManagedToNativeWrapperGenerator
                 var parList = new List<string>();
                 parList.Add(parameterName);
 
-                var marshalTo = parType;
-
-                if (parameterType.IsArray)
-                {
-                    marshalTo = Utils.GetCppCliTypeFor(parameterType.GetElementType());
-                    GenerateArrayLengthParameters(parameterName, parameterType, ref parList, GenParametersType.NameOnly);
-                }
-
                 if (parTypeTransl.IsMarshalingInContext)
-                    builder.AppendLine("\t" + parType + " " + parVar + " = __IL->__Context->_marshal_as<" + marshalTo + ">(" + string.Join(", ", parList) + ");");
+                    builder.AppendLine("\t" + parType + " " + parVar + " = __IL->__Context->_marshal_as<" + parType + ">(" + string.Join(", ", parList) + ");");
                 else
-                    builder.AppendLine("\t" + parType + " " + parVar + " = _marshal_as<" + marshalTo + ">(" + string.Join(", ", parList) + ");");
+                    builder.AppendLine("\t" + parType + " " + parVar + " = _marshal_as<" + parType + ">(" + string.Join(", ", parList) + ");");
             }
             else if (parTypeTransl.IsCastRequired)
             {
@@ -445,42 +390,10 @@ namespace ManagedToNativeWrapperGenerator
                 else
                 {
                     parList.Add(parTypeTransl.NativeType + " " + parameter.Name);
-                    GenerateArrayLengthParameters(parameter.Name, parameter.ParameterType, ref parList, GenParametersType.Parameter);
                 }
             }
         }
 
-        
-
-        private void GenerateReturnLengthAssignments(Type returnType, StringBuilder builder)
-        {
-            if (returnType.IsArray)
-            {
-                var returnVar = Utils.GetLocalTempNameForReturn();
-
-                // Multidimensional array
-                if (returnType.GetArrayRank() > 1)
-                {
-                    for (var i = 0; i < returnType.GetArrayRank(); i++)
-                    {
-                        builder.AppendLine("\t" + returnVar + "_len" + i + " = " + returnVar + "->GetLength(" + i + ");");
-                    }
-                }
-                else // Jagged arrays
-                {
-                    var elementType = returnType;
-                    var i = 0;
-                    var rank = "";
-
-                    while (elementType.IsArray && elementType.HasElementType)
-                    {
-                        elementType = elementType.GetElementType();
-                        builder.AppendLine("\t" + returnVar + "_len" + (i++) + " = " + returnVar + rank + "->Length;");
-                        rank += "[0]";
-                    }
-                }
-            }
-        }
 
         private void GenerateReturnVal(Type returnType, ref TypeConverter.TypeTranslation retValTransl, StringBuilder builder)
         {

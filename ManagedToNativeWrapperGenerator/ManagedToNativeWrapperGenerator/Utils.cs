@@ -129,25 +129,23 @@ namespace ManagedToNativeWrapperGenerator
             if (parameterType.IsArray)
             {
                 Type t = parameterType;
+                string format = @"{0}";
 
-                string pointers = "";
                 while (t.IsArray && t.HasElementType)
                 {
                     for (int i = 0; i < t.GetArrayRank(); ++i)
-                        pointers += "*";
+                        format = "std::vector<" + format + ">";
 
                     t = t.GetElementType();
                 }
 
                 if (_standardTranslations.TryGetValue(t, out translation))
                 {
-                    // Array of something simple
-                    return new TypeTranslation(parameterType, translation.NativeType + pointers, TFlag.MarshalingRequired);
+                    return new TypeTranslation(parameterType, string.Format(format, translation.NativeType), TFlag.MarshalingRequired); // Array of something simple
                 }
                 else
                 {
-                    // Array of objects
-                    return new TypeTranslation(parameterType, Utils.GetWrapperTypeFullNameFor(t) + pointers + "*", TFlag.MarshalingRequired | TFlag.WrapperRequired | TFlag.ILObject);
+                    return new TypeTranslation(parameterType, string.Format(format, Utils.GetWrapperTypeFullNameFor(t) + "*"), TFlag.MarshalingRequired | TFlag.WrapperRequired | TFlag.ILObject); // Array of objects
                 }
             }
 

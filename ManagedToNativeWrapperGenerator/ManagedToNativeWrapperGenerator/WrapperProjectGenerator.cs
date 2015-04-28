@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
@@ -32,8 +33,8 @@ namespace ManagedToNativeWrapperGenerator
 
             foreach (var gen in this.generatorChain)
             {
-                filesCpp.AddRange(gen.GetGeneratedFiles().FindAll(f => f.EndsWith(".cpp")));
-                filesH.AddRange(gen.GetGeneratedFiles().FindAll(f => f.EndsWith(".h")));
+                filesCpp.AddRange(gen.GetGeneratedFiles().FindAll(f => f.EndsWith(".cpp")).Distinct());
+                filesH.AddRange(gen.GetGeneratedFiles().FindAll(f => f.EndsWith(".h")).Distinct());
             }
 
             builder.AppendLine(
