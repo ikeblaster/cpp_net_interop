@@ -293,14 +293,6 @@ namespace ManagedToNativeWrapperGenerator
 
         #region Helpers - public static
 
-        public enum GenParametersType
-        {
-            Parameter,
-            OutParameter,
-            NameOnly
-        };
-
-        
 
         public static void GenerateMarshalParameter(string parameterName, Type parameterType, StringBuilder builder)
         {
@@ -310,13 +302,10 @@ namespace ManagedToNativeWrapperGenerator
 
             if (parTypeTransl.IsMarshalingRequired)
             {
-                var parList = new List<string>();
-                parList.Add(parameterName);
-
                 if (parTypeTransl.IsMarshalingInContext)
-                    builder.AppendLine("\t" + parType + " " + parVar + " = __IL->__Context->_marshal_as<" + parType + ">(" + string.Join(", ", parList) + ");");
+                    builder.AppendLine("\t" + parType + " " + parVar + " = __IL->__Context->_marshal_as<" + parType + ">(" + parameterName + ");");
                 else
-                    builder.AppendLine("\t" + parType + " " + parVar + " = _marshal_as<" + parType + ">(" + string.Join(", ", parList) + ");");
+                    builder.AppendLine("\t" + parType + " " + parVar + " = _marshal_as<" + parType + ">(" + parameterName + ");");
             }
             else if (parTypeTransl.IsCastRequired)
             {

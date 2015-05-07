@@ -126,31 +126,29 @@ namespace ManagedToNativeWrapperGenerator
             if (_standardTranslations.TryGetValue(parameterType, out translation))
                 return translation;
 
-            if (parameterType.IsArray)
+
+            if ((parameterType.IsArray && parameterType.HasElementType) || (parameterType.IsGenericType && parameterType.GetInterface("ICollection") != null))
             {
-                Type t = parameterType;
-                string format = @"{0}";
+                TypeTranslation tt;
 
-                while (t.IsArray && t.HasElementType)
+                string format = @"std::vector<{0}>";
+
+                if (parameterType.IsArray)
                 {
-                    for (int i = 0; i < t.GetArrayRank(); ++i)
-                        format = "std::vector<" + format + ">";
-
-                    t = t.GetElementType();
-                }
-
-                if (_standardTranslations.TryGetValue(t, out translation))
-                {
-                    return new TypeTranslation(parameterType, string.Format(format, translation.NativeType), TFlag.MarshalingRequired); // Array of something simple
+                    tt = TranslateParameterType(parameterType.GetElementType()); 
+                    
+                    for (int i = 1; i < parameterType.GetArrayRank(); ++i)
+                        format = @"std::vector<" + format + @">";
                 }
                 else
-                {
-                    return new TypeTranslation(parameterType, string.Format(format, Utils.GetWrapperTypeFullNameFor(t) + "*"), TFlag.MarshalingRequired | TFlag.WrapperRequired | TFlag.ILObject); // Array of objects
-                }
+                    tt = TranslateParameterType(parameterType.GetGenericArguments()[0]); // TODO: CHECK: is it safe?
+
+                TFlag flags = TFlag.MarshalingRequired;
+                if (tt.IsILObject) flags |= TFlag.WrapperRequired | TFlag.ILObject;
+
+                return new TypeTranslation(parameterType, string.Format(format, tt.NativeType), flags);
             }
 
-            // TODO: Try more things, like collections
-            // TODO: Convert structures recursively?
 
             // Enums
             if (parameterType.IsEnum)
@@ -167,7 +165,7 @@ namespace ManagedToNativeWrapperGenerator
     {
         public static string GetCppCliTypeFullNameFor(Type type)
         {
-            return "::" + type.FullName.Replace(".", "::").Replace("+","::");
+            return "::" + type.FullName.Replace(".", "::").Replace("+","::").Split('`')[0];
         }
 
         public static string GetCppCliNamespaceFor(Type type)
@@ -187,7 +185,11 @@ namespace ManagedToNativeWrapperGenerator
         {
             string bestEffort;
 
-            if (type.IsArray)
+            if (type.IsGenericType && type.GetInterface("ICollection") != null)
+            {
+                bestEffort = GetCppCliTypeFullNameFor(type) + "<" + GetCppCliTypeFor(type.GetGenericArguments()[0]) + ">";
+            }
+            else if (type.IsArray)
             {
                 bestEffort = "array<" 
                                 + GetCppCliTypeFor(type.GetElementType()) 
@@ -261,6 +263,13 @@ namespace ManagedToNativeWrapperGenerator
         public static string GetWrapperILBridgeFileNameFor(Type type)
         {
             return GetWrapperProjectName() + "_" + GetWrapperILBridgeTypeNameFor(type);
+        }
+
+
+        public static string IndentText(string text, string spacer)
+        {
+            if (text.Length == 0) return text;
+            return spacer + text.Replace(Environment.NewLine, Environment.NewLine + spacer);
         }
     }
 }
