@@ -62,6 +62,7 @@
     <Compile Include="Utils.cs" />
     <Compile Include="WrapperHeaderGenerator.cs" />
     <Compile Include="WrapperSourceGenerator.cs" />
+    <Compile Include="XmlDocHelper.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

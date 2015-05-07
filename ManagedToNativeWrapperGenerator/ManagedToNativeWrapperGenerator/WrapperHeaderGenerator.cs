@@ -10,12 +10,21 @@ namespace ManagedToNativeWrapperGenerator
     public class WrapperHeaderGenerator : TypeGenerator
     {
         private HashSet<Type> declaredClasses;
+        private XmlDocHelper xmlDoc;
         private StringBuilder outClass;
         private StringBuilder outHeader;
 
         public WrapperHeaderGenerator(string outputFolder)
             : base(outputFolder)
         {
+        }
+
+        public override void AssemblyLoad(Assembly assembly)
+        {
+            string dllPath = assembly.Location; 
+            string docuPath = dllPath.Substring(0, dllPath.LastIndexOf(".")) + ".XML";
+
+            this.xmlDoc = new XmlDocHelper(docuPath);
         }
 
         public override void EnumLoad(Type type, FieldInfo[] fields)
@@ -104,6 +113,7 @@ namespace ManagedToNativeWrapperGenerator
             this.outClass.AppendLine("class " + Utils.GetWrapperILBridgeTypeNameFor(type) + ";"); // IL Bridge
             this.outClass.AppendLine();
 
+            GenerateDocComment(this.xmlDoc.getDocDomment(type), this.outClass, "/// ");
             this.outClass.AppendLine("class _LNK " + Utils.GetWrapperTypeNameFor(type) + " {"); // Wrapper class
             this.outClass.AppendLine();
             this.outClass.AppendLine("\tpublic:");
@@ -150,6 +160,7 @@ namespace ManagedToNativeWrapperGenerator
             var parList = new List<string>();
             GenerateParametersList(ctor.GetParameters(), ref parList);
 
+            GenerateDocComment(this.xmlDoc.getDocDomment(ctor), builder);
             builder.Append("\t\t");
             builder.Append(Utils.GetWrapperTypeNameFor(ctor.DeclaringType) + "("); // method name
             builder.Append(string.Join(", ", parList));
@@ -183,6 +194,7 @@ namespace ManagedToNativeWrapperGenerator
 
             // GETTER
             {
+                GenerateDocComment(this.xmlDoc.getDocDomment(field), builder);
                 builder.Append("\t\t");
 
                 if (field.IsStatic) builder.Append("static "); // static keyword
@@ -193,6 +205,7 @@ namespace ManagedToNativeWrapperGenerator
             if (!field.IsInitOnly)
             {
                 builder.AppendLine();
+                GenerateDocComment(this.xmlDoc.getDocDomment(field), builder);
                 builder.Append("\t\t");
 
                 if (field.IsStatic) builder.Append("static "); // static keyword
@@ -229,6 +242,7 @@ namespace ManagedToNativeWrapperGenerator
             var parList = new List<string>();
             GenerateParametersList(method.GetParameters(), ref parList);
 
+            GenerateDocComment(this.xmlDoc.getDocDomment(method), builder);
             builder.Append("\t\t");
 
             if (method.IsStatic) builder.Append("static "); // static keyword
@@ -295,6 +309,13 @@ namespace ManagedToNativeWrapperGenerator
 
             this.declaredClasses.Add(t);
         }
+
+        private void GenerateDocComment(string comment, StringBuilder builder, string spacer = "\t\t/// ")
+        {
+            if (comment.Length == 0) return;
+            builder.AppendLine(Utils.IndentText(comment, spacer));    
+        }
+
 
         #endregion
 
