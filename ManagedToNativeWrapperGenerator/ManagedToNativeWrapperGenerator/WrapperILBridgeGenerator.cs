@@ -109,9 +109,6 @@ namespace ManagedToNativeWrapperGenerator
             return Utils.GetWrapperILBridgeFileNameFor(type) + ".h";
         }
 
-        public override string GetFileNameFor(Type type)
-        {
-            return GetFileName(type);
-        }
+
     }
 }

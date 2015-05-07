@@ -448,10 +448,6 @@ namespace ManagedToNativeWrapperGenerator
             return Utils.GetWrapperFileNameFor(type) + ".cpp";
         }
 
-        public override string GetFileNameFor(Type type)
-        {
-            return GetFileName(type);
-        }
 
     }
 }

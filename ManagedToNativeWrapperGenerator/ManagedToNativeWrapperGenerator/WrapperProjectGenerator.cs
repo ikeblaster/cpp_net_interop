@@ -124,9 +124,5 @@ namespace ManagedToNativeWrapperGenerator
             return Utils.GetWrapperProjectName() + ".vcxproj";
         }
 
-        public override string GetFileNameFor(Type type)
-        {
-            return GetFileName();
-        }
     }
 }

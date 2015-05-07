@@ -33,11 +33,6 @@ namespace ManagedToNativeWrapperGenerator
         {
         }
 
-
-
-        public abstract string GetFileNameFor(Type type);
-
-
         public List<string> GetGeneratedFiles()
         {
             return this.GeneratedFiles;

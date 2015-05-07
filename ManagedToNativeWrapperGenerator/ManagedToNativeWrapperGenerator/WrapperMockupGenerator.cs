@@ -89,9 +89,6 @@ namespace ManagedToNativeWrapperGenerator
             // TODO: recursive?
         }
 
-        public override string GetFileNameFor(Type type)
-        {
-            return null;
-        }
+
     }
 }

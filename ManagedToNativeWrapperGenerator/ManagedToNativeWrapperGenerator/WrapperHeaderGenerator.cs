@@ -306,9 +306,5 @@ namespace ManagedToNativeWrapperGenerator
             return Utils.GetWrapperFileNameFor(type) + ".h";
         }
 
-        public override string GetFileNameFor(Type type)
-        {
-            return GetFileName(type);
-        }
     }
 }
