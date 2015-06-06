@@ -29,8 +29,6 @@ namespace ManagedToNativeWrapperGenerator
 
         public string getDocDomment(MethodInfo method)
         {
-            if (this.xmlDoc == null) return "";
-
             if (method.IsSpecialName)
             {
                 var property = method.DeclaringType.GetProperty(method.Name.Substring(4));
@@ -42,22 +40,28 @@ namespace ManagedToNativeWrapperGenerator
 
         public string getDocDomment(ConstructorInfo ctor)
         {
-            if (this.xmlDoc == null) return "";
             return getDocCommentFor("M:" + ctor.DeclaringType.FullName + ".#ctor" + getParameters(ctor.GetParameters()));
         }
 
         public string getDocDomment(FieldInfo field)
         {
-            if (this.xmlDoc == null) return "";
             return getDocCommentFor("F:" + field.DeclaringType.FullName + field.Name);
         }
 
         public string getDocDomment(Type type)
         {
-            if (this.xmlDoc == null) return "";
             return getDocCommentFor("T:" + type.FullName);
         }
 
+
+
+        private string getDocCommentFor(string nodeName)
+        {
+            if (this.xmlDoc == null) return "";
+            XmlNode node = this.xmlDoc.SelectSingleNode("//member[@name = '" + nodeName + "']");
+            if (node == null) return "";
+            return Regex.Replace(node.InnerXml, Environment.NewLine + @"\s+", Environment.NewLine).Trim();
+        }
 
         private string getParameters(ParameterInfo[] parameters)
         {
@@ -79,14 +83,6 @@ namespace ManagedToNativeWrapperGenerator
 
             return outstr;
         }
-
-        private string getDocCommentFor(string nodeName)
-        {
-            XmlNode node = this.xmlDoc.SelectSingleNode("//member[@name = '" + nodeName + "']");
-            if (node == null) return "";
-            return Regex.Replace(node.InnerXml, Environment.NewLine + @"\s+", Environment.NewLine).Trim();
-        }
-
 
 
 
