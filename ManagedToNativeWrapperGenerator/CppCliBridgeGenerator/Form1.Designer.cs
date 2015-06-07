@@ -50,7 +50,7 @@ namespace CppCliBridgeGenerator
             // buttonAddAssembly
             // 
             this.buttonAddAssembly.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonAddAssembly.Location = new System.Drawing.Point(443, 58);
+            this.buttonAddAssembly.Location = new System.Drawing.Point(495, 58);
             this.buttonAddAssembly.Name = "buttonAddAssembly";
             this.buttonAddAssembly.Size = new System.Drawing.Size(115, 23);
             this.buttonAddAssembly.TabIndex = 1;
@@ -61,7 +61,7 @@ namespace CppCliBridgeGenerator
             // buttonRemoveAssembly
             // 
             this.buttonRemoveAssembly.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonRemoveAssembly.Location = new System.Drawing.Point(443, 87);
+            this.buttonRemoveAssembly.Location = new System.Drawing.Point(495, 87);
             this.buttonRemoveAssembly.Name = "buttonRemoveAssembly";
             this.buttonRemoveAssembly.Size = new System.Drawing.Size(115, 23);
             this.buttonRemoveAssembly.TabIndex = 2;
@@ -72,7 +72,7 @@ namespace CppCliBridgeGenerator
             // buttonGenerate
             // 
             this.buttonGenerate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonGenerate.Location = new System.Drawing.Point(443, 503);
+            this.buttonGenerate.Location = new System.Drawing.Point(495, 503);
             this.buttonGenerate.Name = "buttonGenerate";
             this.buttonGenerate.Size = new System.Drawing.Size(115, 23);
             this.buttonGenerate.TabIndex = 3;
@@ -96,13 +96,13 @@ namespace CppCliBridgeGenerator
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxOutputFolder.Location = new System.Drawing.Point(12, 505);
             this.textBoxOutputFolder.Name = "textBoxOutputFolder";
-            this.textBoxOutputFolder.Size = new System.Drawing.Size(362, 20);
+            this.textBoxOutputFolder.Size = new System.Drawing.Size(414, 20);
             this.textBoxOutputFolder.TabIndex = 5;
             // 
             // buttonOutputFolderBrowse
             // 
             this.buttonOutputFolderBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonOutputFolderBrowse.Location = new System.Drawing.Point(380, 503);
+            this.buttonOutputFolderBrowse.Location = new System.Drawing.Point(432, 503);
             this.buttonOutputFolderBrowse.Name = "buttonOutputFolderBrowse";
             this.buttonOutputFolderBrowse.Size = new System.Drawing.Size(57, 23);
             this.buttonOutputFolderBrowse.TabIndex = 6;
@@ -168,7 +168,7 @@ namespace CppCliBridgeGenerator
             this.treeViewAssemblies.Name = "treeViewAssemblies";
             this.treeViewAssemblies.SelectedImageIndex = 0;
             this.treeViewAssemblies.ShowNodeToolTips = true;
-            this.treeViewAssemblies.Size = new System.Drawing.Size(425, 424);
+            this.treeViewAssemblies.Size = new System.Drawing.Size(477, 424);
             this.treeViewAssemblies.TabIndex = 7;
             this.treeViewAssemblies.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.treeViewAssemblies_AfterCheck);
             this.treeViewAssemblies.DrawNode += new System.Windows.Forms.DrawTreeNodeEventHandler(this.treeViewAssemblies_DrawNode);
@@ -179,7 +179,7 @@ namespace CppCliBridgeGenerator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(570, 538);
+            this.ClientSize = new System.Drawing.Size(622, 538);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.treeViewAssemblies);
