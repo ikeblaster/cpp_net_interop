@@ -5,9 +5,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
-using ManagedToNativeWrapperGenerator.Properties;
+using CppCliBridgeGenerator.Properties;
 
-namespace ManagedToNativeWrapperGenerator
+namespace CppCliBridgeGenerator
 {
     public class WrapperProjectGenerator : TypeGenerator
     {

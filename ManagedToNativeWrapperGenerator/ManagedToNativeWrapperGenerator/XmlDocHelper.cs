@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Xml;
 
-namespace ManagedToNativeWrapperGenerator
+namespace CppCliBridgeGenerator
 {
     class XmlDocHelper
     {

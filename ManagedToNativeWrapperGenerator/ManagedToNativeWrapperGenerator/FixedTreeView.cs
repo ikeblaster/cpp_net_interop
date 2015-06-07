@@ -1,8 +1,8 @@
 ﻿using System.Windows.Forms;
 
-namespace ManagedToNativeWrapperGenerator
+namespace CppCliBridgeGenerator
 {
-    class FixedTreeView : TreeView
+    public class FixedTreeView : TreeView
     {
         protected override void WndProc(ref Message m)
         {

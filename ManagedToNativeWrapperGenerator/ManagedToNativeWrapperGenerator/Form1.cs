@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 
-namespace ManagedToNativeWrapperGenerator
+namespace CppCliBridgeGenerator
 {
     public partial class Form1 : Form
     {

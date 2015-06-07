@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace ManagedToNativeWrapperGenerator
+namespace CppCliBridgeGenerator
 {
     public class WrapperILDelegateGenerator : TypeGenerator
     {

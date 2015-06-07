@@ -8,8 +8,8 @@
     <ProjectGuid>{418D2BB3-DC87-4B16-81C6-9B5B7DB6D082}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ManagedToNativeWrapperGenerator</RootNamespace>
-    <AssemblyName>ManagedToNativeWrapperGenerator</AssemblyName>
+    <RootNamespace>CppCliBridgeGenerator</RootNamespace>
+    <AssemblyName>CppCliBridgeGenerator</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

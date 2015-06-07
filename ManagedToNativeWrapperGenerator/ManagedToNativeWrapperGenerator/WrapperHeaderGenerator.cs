@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 
-namespace ManagedToNativeWrapperGenerator
+namespace CppCliBridgeGenerator
 {
     public class WrapperHeaderGenerator : TypeGenerator
     {
