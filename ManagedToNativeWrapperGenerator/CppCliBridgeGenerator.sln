@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CppCliBridgeGenerator", "ManagedToNativeWrapperGenerator\CppCliBridgeGenerator.csproj", "{418D2BB3-DC87-4B16-81C6-9B5B7DB6D082}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CppCliBridgeGenerator", "CppCliBridgeGenerator\CppCliBridgeGenerator.csproj", "{418D2BB3-DC87-4B16-81C6-9B5B7DB6D082}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
