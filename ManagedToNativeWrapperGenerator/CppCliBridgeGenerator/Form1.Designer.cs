@@ -43,14 +43,22 @@ namespace CppCliBridgeGenerator
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addAssemblyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.removeAssemblyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.treeViewAssemblies = new CppCliBridgeGenerator.FixedTreeView();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonAddAssembly
             // 
             this.buttonAddAssembly.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonAddAssembly.Location = new System.Drawing.Point(495, 58);
+            this.buttonAddAssembly.Location = new System.Drawing.Point(495, 27);
             this.buttonAddAssembly.Name = "buttonAddAssembly";
             this.buttonAddAssembly.Size = new System.Drawing.Size(115, 23);
             this.buttonAddAssembly.TabIndex = 1;
@@ -61,7 +69,7 @@ namespace CppCliBridgeGenerator
             // buttonRemoveAssembly
             // 
             this.buttonRemoveAssembly.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonRemoveAssembly.Location = new System.Drawing.Point(495, 87);
+            this.buttonRemoveAssembly.Location = new System.Drawing.Point(495, 56);
             this.buttonRemoveAssembly.Name = "buttonRemoveAssembly";
             this.buttonRemoveAssembly.Size = new System.Drawing.Size(115, 23);
             this.buttonRemoveAssembly.TabIndex = 2;
@@ -139,20 +147,71 @@ namespace CppCliBridgeGenerator
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(9, 9);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(496, 26);
+            this.label2.Size = new System.Drawing.Size(0, 13);
             this.label2.TabIndex = 8;
-            this.label2.Text = resources.GetString("label2.Text");
             // 
-            // label3
+            // menuStrip1
             // 
-            this.label3.AutoSize = true;
-            this.label3.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.label3.Location = new System.Drawing.Point(9, 38);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(389, 13);
-            this.label3.TabIndex = 9;
-            this.label3.Text = "Part of bachelor thesis. © 2015 Ike Blaster / Vojtech Kinkor, ike@thez.info. ZCU." +
-    "";
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileToolStripMenuItem,
+            this.helpToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(622, 24);
+            this.menuStrip1.TabIndex = 11;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // fileToolStripMenuItem
+            // 
+            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.addAssemblyToolStripMenuItem,
+            this.removeAssemblyToolStripMenuItem,
+            this.toolStripSeparator1,
+            this.exitToolStripMenuItem});
+            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+            this.fileToolStripMenuItem.Text = "File";
+            // 
+            // addAssemblyToolStripMenuItem
+            // 
+            this.addAssemblyToolStripMenuItem.Name = "addAssemblyToolStripMenuItem";
+            this.addAssemblyToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
+            this.addAssemblyToolStripMenuItem.Text = "Add assembly";
+            this.addAssemblyToolStripMenuItem.Click += new System.EventHandler(this.buttonAddAssembly_Click);
+            // 
+            // removeAssemblyToolStripMenuItem
+            // 
+            this.removeAssemblyToolStripMenuItem.Name = "removeAssemblyToolStripMenuItem";
+            this.removeAssemblyToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
+            this.removeAssemblyToolStripMenuItem.Text = "Remove assembly";
+            this.removeAssemblyToolStripMenuItem.Click += new System.EventHandler(this.buttonRemoveAssembly_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(166, 6);
+            // 
+            // exitToolStripMenuItem
+            // 
+            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
+            this.exitToolStripMenuItem.Text = "Exit";
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.CloseApp);
+            // 
+            // helpToolStripMenuItem
+            // 
+            this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.aboutToolStripMenuItem});
+            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.helpToolStripMenuItem.Text = "Help";
+            // 
+            // aboutToolStripMenuItem
+            // 
+            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.aboutToolStripMenuItem.Text = "About and usage";
+            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
             // treeViewAssemblies
             // 
@@ -164,11 +223,11 @@ namespace CppCliBridgeGenerator
             this.treeViewAssemblies.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawText;
             this.treeViewAssemblies.ImageIndex = 0;
             this.treeViewAssemblies.ImageList = this.imageList1;
-            this.treeViewAssemblies.Location = new System.Drawing.Point(12, 58);
+            this.treeViewAssemblies.Location = new System.Drawing.Point(12, 27);
             this.treeViewAssemblies.Name = "treeViewAssemblies";
             this.treeViewAssemblies.SelectedImageIndex = 0;
             this.treeViewAssemblies.ShowNodeToolTips = true;
-            this.treeViewAssemblies.Size = new System.Drawing.Size(477, 424);
+            this.treeViewAssemblies.Size = new System.Drawing.Size(477, 455);
             this.treeViewAssemblies.TabIndex = 7;
             this.treeViewAssemblies.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.treeViewAssemblies_AfterCheck);
             this.treeViewAssemblies.DrawNode += new System.Windows.Forms.DrawTreeNodeEventHandler(this.treeViewAssemblies_DrawNode);
@@ -180,7 +239,6 @@ namespace CppCliBridgeGenerator
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(622, 538);
-            this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.treeViewAssemblies);
             this.Controls.Add(this.buttonOutputFolderBrowse);
@@ -189,10 +247,14 @@ namespace CppCliBridgeGenerator
             this.Controls.Add(this.buttonGenerate);
             this.Controls.Add(this.buttonRemoveAssembly);
             this.Controls.Add(this.buttonAddAssembly);
+            this.Controls.Add(this.menuStrip1);
+            this.MainMenuStrip = this.menuStrip1;
             this.MinimumSize = new System.Drawing.Size(580, 400);
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "C++/CLI bridge generator";
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -211,7 +273,14 @@ namespace CppCliBridgeGenerator
         private FolderBrowserDialog folderBrowserDialog1;
         private FixedTreeView treeViewAssemblies;
         private Label label2;
-        private Label label3;
+        private MenuStrip menuStrip1;
+        private ToolStripMenuItem fileToolStripMenuItem;
+        private ToolStripMenuItem addAssemblyToolStripMenuItem;
+        private ToolStripMenuItem removeAssemblyToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator1;
+        private ToolStripMenuItem exitToolStripMenuItem;
+        private ToolStripMenuItem helpToolStripMenuItem;
+        private ToolStripMenuItem aboutToolStripMenuItem;
 
     }
 }

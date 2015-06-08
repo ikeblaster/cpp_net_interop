@@ -18,6 +18,14 @@ namespace CppCliBridgeGenerator
         }
 
 
+        private void CloseApp(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+
+        #region "Add assembly" methods
+
         private void AddAssembly(String file)
         {
             Assembly assembly;
@@ -32,7 +40,7 @@ namespace CppCliBridgeGenerator
             }
 
 
-            TreeNode nodeAssembly = new TreeNode() { Text = assembly.FullName, ImageKey = "Assembly.png", SelectedImageKey = "Assembly.png", Tag = assembly };
+            TreeNode nodeAssembly = new TreeNode() {Text = assembly.FullName, ImageKey = "Assembly.png", SelectedImageKey = "Assembly.png", Tag = assembly};
             this.treeViewAssemblies.Nodes.Add(nodeAssembly);
 
             nodeAssembly.Expand();
@@ -45,7 +53,7 @@ namespace CppCliBridgeGenerator
                     AddAssembly_enum(nodeAssembly, type);
                 else
                     AddAssembly_class(nodeAssembly, type);
-            }    
+            }
 
         }
 
@@ -54,7 +62,7 @@ namespace CppCliBridgeGenerator
             string img = "Class.png";
             if (!type.IsClass) img = "Struct.png";
 
-            TreeNode nodeType = new TreeNode() { Text = type.FullName, ImageKey = img, SelectedImageKey = img, Tag = type };
+            TreeNode nodeType = new TreeNode() {Text = type.FullName, ImageKey = img, SelectedImageKey = img, Tag = type};
             nodeAssembly.Nodes.Add(nodeType);
 
             var ctors = type.GetConstructors().OrderBy(m => m.Attributes);
@@ -66,9 +74,9 @@ namespace CppCliBridgeGenerator
                 nodeType.Nodes.Add(new TreeNode()
                 {
                     Text = ctor.DeclaringType.Name
-                            + "("
-                            + string.Join(", ", ctor.GetParameters().Select(par => par.ParameterType.Name + " " + par.Name).ToArray())
-                            + ")",
+                           + "("
+                           + string.Join(", ", ctor.GetParameters().Select(par => par.ParameterType.Name + " " + par.Name).ToArray())
+                           + ")",
 
                     ToolTipText = ctor.ToString(),
 
@@ -89,8 +97,8 @@ namespace CppCliBridgeGenerator
                 nodeType.Nodes.Add(new TreeNode()
                 {
                     Text = field.Name
-                            + " : "
-                            + field.FieldType.Name,
+                           + " : "
+                           + field.FieldType.Name,
 
                     ToolTipText = field.ToString(),
 
@@ -116,10 +124,10 @@ namespace CppCliBridgeGenerator
                 nodeType.Nodes.Add(new TreeNode()
                 {
                     Text = method.Name
-                            + "("
-                            + String.Join(", ", method.GetParameters().Select(par => par.ParameterType.Name + " " + par.Name).ToArray())
-                            + ") : "
-                            + method.ReturnType.Name,
+                           + "("
+                           + String.Join(", ", method.GetParameters().Select(par => par.ParameterType.Name + " " + par.Name).ToArray())
+                           + ") : "
+                           + method.ReturnType.Name,
 
                     ToolTipText = (method.IsStatic ? "static " : "") + method.ToString(),
 
@@ -133,7 +141,7 @@ namespace CppCliBridgeGenerator
 
         private void AddAssembly_enum(TreeNode nodeAssembly, Type type)
         {
-            TreeNode nodeType = new TreeNode() { Text = type.FullName, ImageKey = "Enum.png", SelectedImageKey = "Enum.png", Tag = type };
+            TreeNode nodeType = new TreeNode() {Text = type.FullName, ImageKey = "Enum.png", SelectedImageKey = "Enum.png", Tag = type};
             nodeAssembly.Nodes.Add(nodeType);
 
             var fields = type.GetFields(BindingFlags.Public | BindingFlags.Static);
@@ -143,8 +151,8 @@ namespace CppCliBridgeGenerator
                 nodeType.Nodes.Add(new TreeNode()
                 {
                     Text = field.Name
-                            + " = "
-                            + Convert.ChangeType(field.GetValue(null), typeof(ulong)),
+                           + " = "
+                           + Convert.ChangeType(field.GetValue(null), typeof(ulong)),
 
                     ToolTipText = field.ToString(),
 
@@ -156,6 +164,8 @@ namespace CppCliBridgeGenerator
 
 
         }
+
+        #endregion
 
 
         #region TreeView Events
@@ -264,9 +274,13 @@ namespace CppCliBridgeGenerator
 
         private void buttonRemoveAssembly_Click(object sender, EventArgs e)
         {
-            if (this.treeViewAssemblies.SelectedNode.Parent == null)
+            if (this.treeViewAssemblies.SelectedNode != null && this.treeViewAssemblies.SelectedNode.Parent == null)
             {
                 this.treeViewAssemblies.SelectedNode.Remove();
+            }
+            else
+            {
+                MessageBox.Show("Please select assembly (root node in tree).");
             }
         }
 
@@ -280,72 +294,86 @@ namespace CppCliBridgeGenerator
 
         private void buttonGenerate_Click(object sender, EventArgs e)
         {
-            
+           
             try
             {
             	Directory.CreateDirectory(this.textBoxOutputFolder.Text);
             }
             catch (Exception)
             {
-                MessageBox.Show("The output folder path is invalid.");
+                MessageBox.Show("The entered output folder path is invalid.\nPlease choose valid path and try again.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
 
-            var generatorChain = new List<TypeGenerator>();
-
-            generatorChain.Add(new WrapperMockupGenerator(this.textBoxOutputFolder.Text, generatorChain)); // fixes missing files
-            generatorChain.Add(new WrapperHeaderGenerator(this.textBoxOutputFolder.Text));
-            generatorChain.Add(new WrapperSourceGenerator(this.textBoxOutputFolder.Text));
-            generatorChain.Add(new WrapperILBridgeGenerator(this.textBoxOutputFolder.Text));
-            generatorChain.Add(new WrapperILDelegateGenerator(this.textBoxOutputFolder.Text));
-            generatorChain.Add(new WrapperProjectGenerator(this.textBoxOutputFolder.Text, generatorChain));
-
-            foreach (TreeNode nodeAssembly in this.treeViewAssemblies.Nodes)
+            try
             {
-                if (!nodeAssembly.Checked) continue;
+                var generatorChain = new List<TypeGenerator>();
 
-                // call AssemblyLoad
-                generatorChain.ForEach(g => g.AssemblyLoad((Assembly) nodeAssembly.Tag));
+                generatorChain.Add(new WrapperMockupGenerator(this.textBoxOutputFolder.Text, generatorChain)); // fixes missing files
+                generatorChain.Add(new WrapperHeaderGenerator(this.textBoxOutputFolder.Text));
+                generatorChain.Add(new WrapperSourceGenerator(this.textBoxOutputFolder.Text));
+                generatorChain.Add(new WrapperILBridgeGenerator(this.textBoxOutputFolder.Text));
+                generatorChain.Add(new WrapperILDelegateGenerator(this.textBoxOutputFolder.Text));
+                generatorChain.Add(new WrapperProjectGenerator(this.textBoxOutputFolder.Text, generatorChain));
 
-                foreach (TreeNode nodeType in nodeAssembly.Nodes)
+                foreach (TreeNode nodeAssembly in this.treeViewAssemblies.Nodes)
                 {
-                    if (!nodeType.Checked) continue;
+                    if (!nodeAssembly.Checked) continue;
 
-                    var type = (Type) nodeType.Tag;
+                    // call AssemblyLoad
+                    generatorChain.ForEach(g => g.AssemblyLoad((Assembly)nodeAssembly.Tag));
 
-                    if (type.IsEnum)
+                    foreach (TreeNode nodeType in nodeAssembly.Nodes)
                     {
-                        var chcked = nodeType.Nodes.OfType<TreeNode>().Where(n => n.Checked);
-                        var fields = chcked.Where(n => n.Tag is FieldInfo).Select(n => n.Tag).Cast<FieldInfo>().ToArray();
+                        if (!nodeType.Checked) continue;
 
-                        // call EnumLoad
-                        generatorChain.ForEach(g => g.EnumLoad(type, fields));
+                        var type = (Type)nodeType.Tag;
+
+                        if (type.IsEnum)
+                        {
+                            var chcked = nodeType.Nodes.OfType<TreeNode>().Where(n => n.Checked);
+                            var fields = chcked.Where(n => n.Tag is FieldInfo).Select(n => n.Tag).Cast<FieldInfo>().ToArray();
+
+                            // call EnumLoad
+                            generatorChain.ForEach(g => g.EnumLoad(type, fields));
+                        }
+                        else
+                        {
+                            var chcked = nodeType.Nodes.OfType<TreeNode>().Where(n => n.Checked);
+
+                            var fields = chcked.Where(n => n.Tag is FieldInfo).Select(n => n.Tag).Cast<FieldInfo>().ToArray();
+                            var ctors = chcked.Where(n => n.Tag is ConstructorInfo).Select(n => n.Tag).Cast<ConstructorInfo>().ToArray();
+                            var methods = chcked.Where(n => n.Tag is MethodInfo).Select(n => n.Tag).Cast<MethodInfo>().ToArray();
+
+                            // call ClassLoad
+                            generatorChain.ForEach(g => g.ClassLoad(type, fields, ctors, methods));
+                        }
                     }
-                    else
-                    {
-                        var chcked = nodeType.Nodes.OfType<TreeNode>().Where(n => n.Checked);
 
-                        var fields = chcked.Where(n => n.Tag is FieldInfo).Select(n => n.Tag).Cast<FieldInfo>().ToArray();
-                        var ctors = chcked.Where(n => n.Tag is ConstructorInfo).Select(n => n.Tag).Cast<ConstructorInfo>().ToArray();
-                        var methods = chcked.Where(n => n.Tag is MethodInfo).Select(n => n.Tag).Cast<MethodInfo>().ToArray();
+                }
 
-                        // call ClassLoad
-                        generatorChain.ForEach(g => g.ClassLoad(type, fields, ctors, methods));
-                    }
-                }   
 
+                // call GeneratorFinalize
+                generatorChain.ForEach(g => g.GeneratorFinalize());
+
+                MessageBox.Show("Generation succesfully done!", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch
+            {
+                MessageBox.Show("Sorry, an error occured during generation.\nFeel free to contact the author to solve this issue.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
+        }
 
-            // call GeneratorFinalize
-            generatorChain.ForEach(g => g.GeneratorFinalize());
-
-
-            MessageBox.Show("Done");
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            new FormInfo().ShowDialog();
         }
 
         #endregion
+
+
 
 
 
