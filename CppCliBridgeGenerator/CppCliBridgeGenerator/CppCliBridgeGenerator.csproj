@@ -53,6 +53,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="TypeConverter.cs" />
     <Compile Include="WrapperILDelegateGenerator.cs" />
     <Compile Include="IEnumerableExtension.cs" />
     <Compile Include="WrapperMockupGenerator.cs" />
