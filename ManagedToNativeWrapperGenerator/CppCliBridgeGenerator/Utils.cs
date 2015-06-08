@@ -7,6 +7,9 @@ namespace CppCliBridgeGenerator
     public static class TypeConverter
     {
 
+        /// <summary>
+        /// Flags for different types of working with "types" (classes, structs, ...)
+        /// </summary>
         [Flags]
         public enum TFlag
         {
@@ -18,6 +21,10 @@ namespace CppCliBridgeGenerator
             ILObject = 16
         }
 
+        /// <summary>
+        /// Type translation helper - wrapper class.
+        /// It is designed to hold information about types and their translation in managed (c++/cli) and unmanaged (c++) "versions".
+        /// </summary>
         public class TypeTranslation
         {
             private readonly Type _managedType;
@@ -47,7 +54,6 @@ namespace CppCliBridgeGenerator
             public TypeTranslation(Type managedType, TFlag ti = TFlag.None)
                 : this(managedType, null, ti)
             {
-                
             }
 
 
@@ -93,8 +99,15 @@ namespace CppCliBridgeGenerator
 
         }
 
+        /// <summary>
+        /// Dictionary with blittable types translations.
+        /// </summary>
         static Dictionary<Type, TypeTranslation> _standardTranslations = new Dictionary<Type, TypeTranslation>();
 
+        /// <summary>
+        /// Type converter/translator static initializer.
+        /// Initializes all known blittable types (ints/double/...).
+        /// </summary>
         static TypeConverter()
         {
             List<TypeTranslation> translations = new List<TypeTranslation>();
@@ -112,7 +125,7 @@ namespace CppCliBridgeGenerator
             translations.Add(new TypeTranslation(typeof(bool), "bool"));
             translations.Add(new TypeTranslation(typeof(string), "std::wstring", TFlag.MarshalingRequired));
             translations.Add(new TypeTranslation(typeof(void), "void"));
-            // TODO: More translations (decimal?)
+            // INFO: More translations (decimal?)
 
             foreach (TypeTranslation translation in translations)
             {
@@ -120,60 +133,87 @@ namespace CppCliBridgeGenerator
             }
         }
 
-        public static TypeTranslation TranslateParameterType(Type parameterType)
+        /// <summary>
+        /// Translates type from managed to unmanaged version.
+        /// </summary>
+        /// <param name="type">Type (eg. class) to be translated.</param>
+        /// <returns>TypeTranslation wrapper class, containing translated version.</returns>
+        public static TypeTranslation TranslateType(Type type)
         {
             TypeTranslation translation;
-            if (_standardTranslations.TryGetValue(parameterType, out translation))
+
+            // look in dictionary with blittable types.
+            if (_standardTranslations.TryGetValue(type, out translation))
                 return translation;
 
-
-            if ((parameterType.IsArray && parameterType.HasElementType) || (parameterType.IsGenericType && parameterType.GetInterface("ICollection") != null))
+            // Arrays or collections
+            if ((type.IsArray && type.HasElementType) || (type.IsGenericType && type.GetInterface("ICollection") != null))
             {
                 TypeTranslation tt;
 
                 string format = @"std::vector<{0}>";
 
-                if (parameterType.IsArray)
+                if (type.IsArray)
                 {
-                    tt = TranslateParameterType(parameterType.GetElementType()); 
-                    
-                    for (int i = 1; i < parameterType.GetArrayRank(); ++i)
+                    tt = TranslateType(type.GetElementType());
+
+                    // nested vectors
+                    for (int i = 1; i < type.GetArrayRank(); ++i)
                         format = @"std::vector<" + format + @">";
                 }
                 else
-                    tt = TranslateParameterType(parameterType.GetGenericArguments()[0]); // TODO: CHECK: is it safe?
+                {
+                    tt = TranslateType(type.GetGenericArguments()[0]); // INFO: after all, seems to be safe (collection always have at least one "argument")
+                }
 
                 TFlag flags = TFlag.MarshalingRequired;
                 if (tt.IsILObject) flags |= TFlag.WrapperRequired | TFlag.ILObject;
 
-                return new TypeTranslation(parameterType, string.Format(format, tt.NativeType), flags);
+                return new TypeTranslation(type, string.Format(format, tt.NativeType), flags);
             }
-
 
             // Enums
-            if (parameterType.IsEnum)
+            if (type.IsEnum)
             {
-                return new TypeTranslation(parameterType, Utils.GetWrapperTypeFullNameFor(parameterType), TFlag.CastRequired | TFlag.WrapperRequired);
+                return new TypeTranslation(type, Utils.GetWrapperTypeFullNameFor(type), TFlag.CastRequired | TFlag.WrapperRequired);
             }
 
-            // Objects
-            return new TypeTranslation(parameterType, TFlag.MarshalingRequired | TFlag.WrapperRequired | TFlag.ILObject);
+            // Classes / objects
+            return new TypeTranslation(type, TFlag.MarshalingRequired | TFlag.WrapperRequired | TFlag.ILObject);
         }
     }
 
+    /// <summary>
+    /// Collection of static utils mainly for manipulation with element names.
+    /// </summary>
     public static class Utils
     {
+        /// <summary>
+        /// Get raw full name for type usable in C++/CLI.
+        /// </summary>
+        /// <param name="type">Type</param>
+        /// <returns>Formatted fullname</returns>
         public static string GetCppCliTypeFullNameFor(Type type)
         {
-            return "::" + type.FullName.Replace(".", "::").Replace("+","::").Split('`')[0];
+            return "::" + type.FullName.Replace(".", "::").Replace("+","::").Split('`')[0]; // TODO: generic classes usage
         }
 
+        /// <summary>
+        /// Get raw namespace (inline) for type usable in C++/CLI
+        /// </summary>
+        /// <param name="type">Type</param>
+        /// <returns>Formatted namespace</returns>
         public static string GetCppCliNamespaceFor(Type type)
         {
             if (type.Namespace == null) return "";
             return type.Namespace.Replace(".", "::");
         }
 
+        /// <summary>
+        /// Get raw namespace (inline) prefix for type usable in C++/CLI.
+        /// </summary>
+        /// <param name="type">Type</param>
+        /// <returns>Formatted namespace prefix - ie. "NS::" or ""</returns>
         public static string GetCppCliNamespacePrefixFor(Type type)
         {
             if (type.Namespace == null) return "";
@@ -181,46 +221,65 @@ namespace CppCliBridgeGenerator
         }
 
 
+        /// <summary>
+        /// Get type usable in C++/CLI.
+        /// </summary>
+        /// <param name="type">Type</param>
+        /// <returns>Formatted type</returns>
         public static string GetCppCliTypeFor(Type type)
         {
-            string bestEffort;
+            string cppcli;
 
+            // Generic types, but not collections (which are translated)
             if (type.IsGenericType && type.GetInterface("ICollection") != null)
             {
-                bestEffort = GetCppCliTypeFullNameFor(type) + "<" + GetCppCliTypeFor(type.GetGenericArguments()[0]) + ">";
+                cppcli = GetCppCliTypeFullNameFor(type) + "<" + GetCppCliTypeFor(type.GetGenericArguments()[0]) + ">";
             }
-            else if (type.IsArray)
+            else if (type.IsArray) // Arrays
             {
-                bestEffort = "array<" 
+                cppcli = "array<" 
                                 + GetCppCliTypeFor(type.GetElementType()) 
                                 + (type.GetArrayRank() > 1 ? ("," + type.GetArrayRank()) : "") 
                                 + ">";
             }
-            else 
+            else // Everything else
             {
-                bestEffort = GetCppCliTypeFullNameFor(type);
+                cppcli = GetCppCliTypeFullNameFor(type);
             }
 
             if (!type.IsValueType)
             {
-                return bestEffort + "^";
+                return cppcli + "^"; // add "hat" for objects
             }
 
-            return bestEffort;
+            return cppcli;
         }
 
 
-
+        /// <summary>
+        /// Get name for temporary local variable - parameter.
+        /// </summary>
+        /// <param name="parameter">Parameter</param>
+        /// <returns>Variable name</returns>
         public static string GetLocalTempNameFor(ParameterInfo parameter)
         {
             return GetLocalTempNameFor(parameter.Name);
         }
 
+        /// <summary>
+        /// Get name for temporary local variable.
+        /// </summary>
+        /// <param name="name">Original variable name</param>
+        /// <returns>Variable name</returns>
         public static string GetLocalTempNameFor(String name)
         {
             return "__Param_" + name;
         }
 
+        /// <summary>
+        /// Get name for temporary local variable for return value.
+        /// </summary>
+        /// <returns>Variable name</returns>
         public static string GetLocalTempNameForReturn()
         {
             return "__ReturnVal";
@@ -228,44 +287,82 @@ namespace CppCliBridgeGenerator
 
 
 
+        /// <summary>
+        /// Get wrapper name (can be used for project name, namespace wrapper, prefixes/postfixes, ...).
+        /// </summary>
         public static string GetWrapperProjectName()
         {
             return "Wrapper";
         }
 
+        /// <summary>
+        /// Get bridge name for type.
+        /// </summary>
+        /// <param name="type">Type</param>
+        /// <returns>Formatted name</returns>
         public static string GetWrapperTypeNameFor(Type type)
         {
             return type.Name.Replace('.', '_');
         }
 
+        /// <summary>
+        /// Get IL bridge name for type.
+        /// </summary>
+        /// <param name="type">Type</param>
+        /// <returns>Formatted name</returns>
         public static string GetWrapperILBridgeTypeNameFor(Type type)
         {
             return GetWrapperTypeNameFor(type) + "_IL";
         }
 
 
-
+        /// <summary>
+        ///  Get bridge fullname for type.
+        /// </summary>
+        /// <param name="type">Type</param>
+        /// <returns>Formatted name</returns>
         public static string GetWrapperTypeFullNameFor(Type type)
         {
             return GetWrapperProjectName() + "::" + GetCppCliNamespacePrefixFor(type) + GetWrapperTypeNameFor(type);
         }
 
+        /// <summary>
+        /// Get IL bridge fullname for type.
+        /// </summary>
+        /// <param name="type">Type</param>
+        /// <returns>Formatted name</returns>
         public static string GetWrapperILBridgeTypeFullNameFor(Type type)
         {
             return GetWrapperProjectName() + "::" + GetCppCliNamespacePrefixFor(type) + GetWrapperILBridgeTypeNameFor(type);
         }
 
 
+        /// <summary>
+        /// Get bridge filename for type without extension.
+        /// </summary>
+        /// <param name="type">Type</param>
+        /// <returns>Filename</returns>
         public static string GetWrapperFileNameFor(Type type)
         {
             return GetWrapperProjectName() + "_" + GetWrapperTypeNameFor(type);
         }
+        /// <summary>
+        /// Get IL bridge filename for type without extension.
+        /// </summary>
+        /// <param name="type">Type</param>
+        /// <returns>Filename</returns>
         public static string GetWrapperILBridgeFileNameFor(Type type)
         {
             return GetWrapperProjectName() + "_" + GetWrapperILBridgeTypeNameFor(type);
         }
 
 
+        /// <summary>
+        /// Indent all lines with some text.
+        /// </summary>
+        /// <param name="text">Text</param>
+        /// <param name="spacer">Text used as indentation</param>
+        /// <returns>Indented text</returns>
         public static string IndentText(string text, string spacer)
         {
             if (text.Length == 0) return text;

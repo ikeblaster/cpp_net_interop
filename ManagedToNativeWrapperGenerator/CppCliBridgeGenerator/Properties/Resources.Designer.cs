@@ -77,9 +77,9 @@ namespace CppCliBridgeGenerator.Properties {
         ///template&lt;typename T&gt; struct underlying_type_of&lt;std::vector&lt;T&gt;&gt; { typedef T type; };
         /////template&lt;typename T&gt; struct underlying_type [rest of string was truncated]&quot;;.
         /// </summary>
-        public static string marshaler_ext {
+        public static string marshaller_ext {
             get {
-                return ResourceManager.GetString("marshaler_ext", resourceCulture);
+                return ResourceManager.GetString("marshaller_ext", resourceCulture);
             }
         }
     }

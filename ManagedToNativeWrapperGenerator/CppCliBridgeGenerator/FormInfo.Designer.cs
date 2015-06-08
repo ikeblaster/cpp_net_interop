@@ -70,13 +70,14 @@
             // 
             // button1
             // 
+            this.button1.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.button1.Location = new System.Drawing.Point(433, 132);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 14;
             this.button1.Text = "OK";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button1.Click += new System.EventHandler(this.CloseApp);
             // 
             // label1
             // 
@@ -84,9 +85,9 @@
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.label1.Location = new System.Drawing.Point(12, 9);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(181, 16);
+            this.label1.Size = new System.Drawing.Size(242, 16);
             this.label1.TabIndex = 15;
-            this.label1.Text = "C++/CLI bridge generator";
+            this.label1.Text = "C++/CLI bridge-wrapper generator";
             // 
             // FormInfo
             // 

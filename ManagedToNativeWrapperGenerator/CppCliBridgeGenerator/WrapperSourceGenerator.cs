@@ -6,6 +6,9 @@ using System.Text;
 
 namespace CppCliBridgeGenerator
 {
+    /// <summary>
+    /// Generator for bridge source file.
+    /// </summary>
     public class WrapperSourceGenerator : TypeGenerator
     {
         private readonly bool usesMarshalContext = false;
@@ -13,11 +16,23 @@ namespace CppCliBridgeGenerator
         private StringBuilder outClass;
         private StringBuilder outHeader;
 
+        /// <summary>
+        /// Generator for bridge source file.
+        /// </summary>
+        /// <param name="outputFolder">Output folder.</param>
         public WrapperSourceGenerator(string outputFolder)
             : base(outputFolder)
         {
         }
 
+
+        /// <summary>
+        /// Called for classes.
+        /// </summary>
+        /// <param name="type">Type with class.</param>
+        /// <param name="fields">Selected fields.</param>
+        /// <param name="ctors">Selected constructors.</param>
+        /// <param name="methods">selected methods.</param>
         public override void ClassLoad(Type type, FieldInfo[] fields, ConstructorInfo[] ctors, MethodInfo[] methods)
         {
             if (typeof(MulticastDelegate).IsAssignableFrom(type))
@@ -32,22 +47,19 @@ namespace CppCliBridgeGenerator
             this.outHeader.AppendLine("#pragma once");
             this.outHeader.AppendLine("#pragma managed");
 
-            this.outHeader.AppendLine("#include <msclr\\auto_gcroot.h>");
-            this.outHeader.AppendLine("#include <msclr\\marshal_cppstd.h>");
-            this.outHeader.AppendLine("using namespace msclr::interop;");
             this.outHeader.AppendLine();
-            this.outHeader.AppendLine("#include \"marshaler_ext.h\"");
+            this.outHeader.AppendLine("#include \"marshaller_ext.h\"");
             this.outHeader.AppendLine();
             this.outHeader.AppendLine("#define _LNK __declspec(dllexport)");
-            this.outHeader.AppendLine("#using \"" + type.Module.Name + "\"");
+            this.outHeader.AppendLine("#using \"" + type.Module.Name + "\""); // reference to assembly
 
-            this.outHeader.AppendLine("#include \"" + WrapperILBridgeGenerator.GetFileName(type) + "\"");
+            this.outHeader.AppendLine("#include \"" + WrapperILBridgeGenerator.GetFileName(type) + "\""); // include own IL bridge
 
-            GenerateNamespaces(type, this.outClass);
-            GenerateCtors(type, ctors);
-            GenerateFields(type, fields);
-            GenerateMethods(type, methods);
-            GenerateEndNamespaces(type, this.outClass);
+            GenerateNamespaces(type, this.outClass); // opening namespace
+            GenerateCtors(type, ctors); // constructors
+            GenerateFields(type, fields); // class fields getters/setters
+            GenerateMethods(type, methods); // methods
+            GenerateEndNamespaces(type, this.outClass); // closing namespace
 
             // append class text to header
             this.outHeader.AppendLine();
@@ -59,15 +71,20 @@ namespace CppCliBridgeGenerator
 
         #region Ctors/dctors generators
 
+        /// <summary>
+        /// Generation of constructors
+        /// </summary>
+        /// <param name="type">Parent class.</param>
+        /// <param name="ctors">Selected constructors</param>
         private void GenerateCtors(Type type, ConstructorInfo[] ctors)
         {
-            var className = Utils.GetWrapperTypeNameFor(type);
+            var className = Utils.GetWrapperTypeNameFor(type); // bridge class name
 
             foreach (var ctor in ctors)
             {
                 if (ctor.DeclaringType == type)
                 {
-                    GenerateCtor(ctor, this.outClass);
+                    GenerateCtor(ctor, this.outClass); // generate one constructor
                     this.outClass.AppendLine();
                 }
             }
@@ -82,7 +99,7 @@ namespace CppCliBridgeGenerator
                 this.outClass.AppendLine();
             }
 
-            // constructor for generated objects
+            // constructor for wrapping generated objects (with IL bridge parameter)
             this.outClass.AppendLine(className + "::" + className + "(" + Utils.GetWrapperILBridgeTypeNameFor(type) + "* IL) {");
             this.outClass.AppendLine("\t__IL = IL;");
             if (this.usesMarshalContext) this.outClass.AppendLine("\t__IL->__Context = gcnew marshal_context;");
@@ -95,13 +112,18 @@ namespace CppCliBridgeGenerator
             this.outClass.AppendLine("}");
         }
 
+        /// <summary>
+        /// Generation of one constructor.
+        /// </summary>
+        /// <param name="ctor">Constructor.</param>
+        /// <param name="builder">Output StringBuilder.</param>
         private void GenerateCtor(ConstructorInfo ctor, StringBuilder builder)
         {
             // generate ctor parameters
             var parList = new List<string>();
             GenerateParametersList(ctor.GetParameters(), ref parList);
 
-            var className = Utils.GetWrapperTypeNameFor(ctor.DeclaringType);
+            var className = Utils.GetWrapperTypeNameFor(ctor.DeclaringType); // bridge class name
 
             // signature
             builder.AppendLine(className + "::" + className + "(" + string.Join(", ", parList) + ") {");
@@ -109,15 +131,15 @@ namespace CppCliBridgeGenerator
             // body
             foreach (var parameter in ctor.GetParameters())
             {
-                GenerateMarshalParameter(parameter.Name, parameter.ParameterType, builder);
+                GenerateMarshalParameter(parameter.Name, parameter.ParameterType, builder); // translate/marshal parameters
             }
 
-            builder.AppendLine("\t__IL = new " + Utils.GetWrapperILBridgeTypeNameFor(ctor.DeclaringType) + ";");
-            builder.Append("\t__IL->__Impl = gcnew " + Utils.GetCppCliTypeFullNameFor(ctor.DeclaringType) + "(");
-            builder.Append(string.Join(", ", ctor.GetParameters().Select(par => Utils.GetLocalTempNameFor(par))));
+            builder.AppendLine("\t__IL = new " + Utils.GetWrapperILBridgeTypeNameFor(ctor.DeclaringType) + ";"); // create IL bridge instance
+            builder.Append("\t__IL->__Impl = gcnew " + Utils.GetCppCliTypeFullNameFor(ctor.DeclaringType) + "("); // create instance of managed object
+            builder.Append(string.Join(", ", ctor.GetParameters().Select(par => Utils.GetLocalTempNameFor(par)))); // with parameters
             builder.AppendLine(");");
 
-            if (this.usesMarshalContext) builder.AppendLine("\t__IL->__Context = gcnew marshal_context;");
+            if (this.usesMarshalContext) builder.AppendLine("\t__IL->__Context = gcnew marshal_context;"); // create marshalling context, if needed
             builder.AppendLine("}");
         }
 
@@ -125,22 +147,32 @@ namespace CppCliBridgeGenerator
 
         #region Fields generator
 
+        /// <summary>
+        /// Generation of class fields signatures.
+        /// </summary>
+        /// <param name="type">Parent type.</param>
+        /// <param name="fields">Selected fields.</param>
         private void GenerateFields(Type type, FieldInfo[] fields)
         {
             foreach (var field in fields)
             {
-                if (field.DeclaringType == type)
+                if (field.DeclaringType == type) // skip inherited
                 {
                     this.outClass.AppendLine();
-                    GenerateField(field, this.outClass);
+                    GenerateField(field, this.outClass); 
                 }
             }
         }
 
+        /// <summary>
+        /// Generate one field - getter and setter.
+        /// </summary>
+        /// <param name="field">Field.</param>
+        /// <param name="builder">Output StringBuilder.</param>
         private void GenerateField(FieldInfo field, StringBuilder builder)
         {
             // translate return type
-            var typeTransl = TypeConverter.TranslateParameterType(field.FieldType);
+            var typeTransl = TypeConverter.TranslateType(field.FieldType);
             if (typeTransl.IsWrapperRequired)
             {
                 GenerateIlBridgeInclude(typeTransl.ManagedType, this.outHeader);
@@ -200,11 +232,16 @@ namespace CppCliBridgeGenerator
 
         #region Methods generator
 
+        /// <summary>
+        /// Generation of methods.
+        /// </summary>
+        /// <param name="type">Parent class.</param>
+        /// <param name="methods">Selected methods.</param>
         private void GenerateMethods(Type type, MethodInfo[] methods)
         {
             foreach (var method in methods)
             {
-                if (method.DeclaringType == type)
+                if (method.DeclaringType == type) // skip inherited
                 {
                     this.outClass.AppendLine();
                     GenerateMethod(method, this.outClass);
@@ -212,12 +249,18 @@ namespace CppCliBridgeGenerator
             }
         }
 
+        /// <summary>
+        /// Generation of one method.
+        /// </summary>
+        /// <param name="method">Method.</param>
+        /// <param name="builder">Output StringBuilder.</param>
         private void GenerateMethod(MethodInfo method, StringBuilder builder)
         {
-            var retValTransl = TypeConverter.TranslateParameterType(method.ReturnType);
+            // translate return value type
+            var retValTransl = TypeConverter.TranslateType(method.ReturnType);
             if (retValTransl.IsWrapperRequired)
             {
-                GenerateIlBridgeInclude(retValTransl.ManagedType, this.outHeader);
+                GenerateIlBridgeInclude(retValTransl.ManagedType, this.outHeader); // include missing bridge
             }
 
             // signature
@@ -235,20 +278,31 @@ namespace CppCliBridgeGenerator
             builder.AppendLine("}");
         }
 
+        /// <summary>
+        /// Method - signature generation.
+        /// </summary>
+        /// <param name="method">Method.</param>
+        /// <param name="retValTransl">Return value type translation.</param>
+        /// <param name="builder">Output StringBuilder.</param>
         private void GenerateMethod_Signature(MethodInfo method, ref TypeConverter.TypeTranslation retValTransl, StringBuilder builder)
         {
             var parList = new List<string>();
 
-            // METHOD NAME
+            // method name
             builder.Append(retValTransl.NativeType + " " + Utils.GetWrapperTypeNameFor(method.DeclaringType) + "::" + method.Name + "(");
 
-            // METHOD PARAMETERS
+            // parameters
             GenerateParametersList(method.GetParameters(), ref parList);
 
             builder.Append(string.Join(", ", parList));
             builder.Append(") ");
         }
 
+        /// <summary>
+        /// Method - marshal/translate parameters.
+        /// </summary>
+        /// <param name="method">Method.</param>
+        /// <param name="builder">Output StringBuilder.</param>
         private void GenerateMethod_MarshalParameters(MethodInfo method, StringBuilder builder)
         {
             foreach (var parameter in method.GetParameters())
@@ -257,29 +311,35 @@ namespace CppCliBridgeGenerator
             }
         }
 
+        /// <summary>
+        /// Method - generate call of managed method.
+        /// </summary>
+        /// <param name="method">Method.</param>
+        /// <param name="builder">Output StringBuilder.</param>
         private void GenerateMethod_CallManaged(MethodInfo method, StringBuilder builder)
         {
-            //  GET RETURN VALUE
             builder.Append("\t");
 
+            // prepare return variable
             if (method.ReturnType != typeof (void))
             {
                 builder.Append(Utils.GetCppCliTypeFor(method.ReturnType) + " " + Utils.GetLocalTempNameForReturn() + " = ");
             }
 
+            // call prefix
             if (method.IsStatic)
                 builder.Append(Utils.GetCppCliTypeFullNameFor(method.DeclaringType) + "::");
             else
                 builder.Append("__IL->__Impl->");
 
-            // CALL METHOD
+            // call managed method itself
             if (!method.IsSpecialName || method.DeclaringType == null)
             {
                 builder.Append(method.Name + "(");
-                builder.Append(string.Join(", ", method.GetParameters().Select(par => Utils.GetLocalTempNameFor(par))));
+                builder.Append(string.Join(", ", method.GetParameters().Select(par => Utils.GetLocalTempNameFor(par)))); // pass parameters
                 builder.AppendLine(");");
             }
-            // GET/SET PROPERTY
+            // or get/set according field (for properties)
             else
             {
                 var property = method.DeclaringType.GetProperty(method.Name.Substring(4));
@@ -291,14 +351,66 @@ namespace CppCliBridgeGenerator
 
         #endregion
 
-        #region Helpers - public static
+
+        #region Helpers
 
 
-        public static void GenerateMarshalParameter(string parameterName, Type parameterType, StringBuilder builder)
+
+        /// <summary>
+        /// Generation of parameters for methods/constructors.
+        /// </summary>
+        /// <param name="parameters">Selected parameters.</param>
+        /// <param name="parList">Output list of parameters.</param>
+        private void GenerateParametersList(ParameterInfo[] parameters, ref List<string> parList)
         {
-            var parType = Utils.GetCppCliTypeFor(parameterType);
-            var parVar = Utils.GetLocalTempNameFor(parameterName);
-            var parTypeTransl = TypeConverter.TranslateParameterType(parameterType);
+            foreach (var parameter in parameters)
+            {
+                // translate parameter
+                var parTypeTransl = TypeConverter.TranslateType(parameter.ParameterType);
+                if (parTypeTransl.IsWrapperRequired)
+                {
+                    GenerateIlBridgeInclude(parTypeTransl.ManagedType, this.outHeader); // include missing bridge
+                }
+
+                // delegates
+                if (typeof(MulticastDelegate).IsAssignableFrom(parameter.ParameterType))
+                {
+                    var method = parameter.ParameterType.GetMethod("Invoke");
+                    var delegateParList = new List<string>();
+
+                    // return type translation
+                    var retTypeTransl = TypeConverter.TranslateType(method.ReturnType);
+                    if (retTypeTransl.IsWrapperRequired)
+                    {
+                        GenerateIlBridgeInclude(retTypeTransl.ManagedType, this.outHeader); // include missing bridge
+                    }
+
+                    // get parameters of delegate
+                    GenerateParametersList(method.GetParameters(), ref delegateParList);
+
+                    // add to output
+                    parList.Add(retTypeTransl.NativeType + " (*" + parameter.Name + ")(" + string.Join(", ", delegateParList) + ")");
+                }
+                else // everything else
+                {
+                    // add to output
+                    parList.Add(parTypeTransl.NativeType + " " + parameter.Name);
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Generation of parameter translation/marshalling.
+        /// </summary>
+        /// <param name="parameterName">Variable name for parameter.</param>
+        /// <param name="parameterType">Type of parameter.</param>
+        /// <param name="builder">Output StringBuilder.</param>
+        private void GenerateMarshalParameter(string parameterName, Type parameterType, StringBuilder builder)
+        {
+            var parTypeTransl = TypeConverter.TranslateType(parameterType); // type translation
+            var parType = Utils.GetCppCliTypeFor(parameterType); // type
+            var parVar = Utils.GetLocalTempNameFor(parameterName); // variable name
 
             if (parTypeTransl.IsMarshalingRequired)
             {
@@ -317,121 +429,115 @@ namespace CppCliBridgeGenerator
             }
         }
 
-        public static void GenerateNamespaces(Type type, StringBuilder builder)
-        {
-            builder.AppendLine("namespace " + Utils.GetWrapperProjectName() + " {");
 
-            if (type.Namespace != null)
-            {
-                var namespaces = type.Namespace.Split('.');
-                foreach (var ns in namespaces)
-                {
-                    builder.AppendLine("namespace " + ns + " {");
-                }
-            }
-            builder.AppendLine();
-        }
-
-        public static void GenerateEndNamespaces(Type type, StringBuilder builder)
-        {
-            if (type.Namespace != null)
-            {
-                var namespaces = type.Namespace.Split('.');
-                builder.AppendLine();
-
-                foreach (var ns in namespaces)
-                {
-                    builder.AppendLine("}");
-                }
-            }
-            builder.AppendLine("}");
-        }
-
-        #endregion
-
-        #region Helpers
-
-        private void GenerateParametersList(ParameterInfo[] parameters, ref List<string> parList)
-        {
-            foreach (var parameter in parameters)
-            {
-                var parTypeTransl = TypeConverter.TranslateParameterType(parameter.ParameterType);
-                if (parTypeTransl.IsWrapperRequired)
-                {
-                    GenerateIlBridgeInclude(parTypeTransl.ManagedType, this.outHeader);
-                }
-
-                if (typeof(MulticastDelegate).IsAssignableFrom(parameter.ParameterType))
-                {
-                    var method = parameter.ParameterType.GetMethod("Invoke");
-                    var delegateParList = new List<string>();
-
-                    var retTypeTransl = TypeConverter.TranslateParameterType(method.ReturnType);
-                    if (retTypeTransl.IsWrapperRequired)
-                    {
-                        GenerateIlBridgeInclude(retTypeTransl.ManagedType, this.outHeader);
-                    }
-
-                    GenerateParametersList(method.GetParameters(), ref delegateParList);
-
-                    parList.Add(retTypeTransl.NativeType + " (*" + parameter.Name + ")(" + string.Join(", ", delegateParList) + ")");
-                }
-                else
-                {
-                    parList.Add(parTypeTransl.NativeType + " " + parameter.Name);
-                }
-            }
-        }
-
-
+        /// <summary>
+        /// Generation of return value translation/marshalling.
+        /// </summary>
+        /// <param name="returnType">Return value type.</param>
+        /// <param name="retValTransl">Return value type translation.</param>
+        /// <param name="builder">Output StringBuilder.</param>
         private void GenerateReturnVal(Type returnType, ref TypeConverter.TypeTranslation retValTransl, StringBuilder builder)
         {
-            //  - RETURN / MARSHAL RETURN / WRAPPED RETURN
-            if (returnType != typeof (void))
+            if (returnType != typeof(void))
             {
-                var returnVar = Utils.GetLocalTempNameForReturn();
+                var retType = retValTransl.NativeType; // type
+                var retVar = Utils.GetLocalTempNameForReturn(); // variable name
 
                 if (retValTransl.IsMarshalingRequired)
                 {
                     if (retValTransl.IsMarshalingInContext)
-                        builder.AppendLine("\t" + retValTransl.NativeType + " " + returnVar + "Marshaled = __IL->__Context->_marshal_as<" + retValTransl.NativeType + ">(" + returnVar + ");");
+                        builder.AppendLine("\t" + retType + " " + retVar + "Marshaled = __IL->__Context->_marshal_as<" + retType + ">(" + retVar + ");");
                     else
-                        builder.AppendLine("\t" + retValTransl.NativeType + " " + returnVar + "Marshaled = _marshal_as<" + retValTransl.NativeType + ">(" + returnVar + ");");
+                        builder.AppendLine("\t" + retType + " " + retVar + "Marshaled = _marshal_as<" + retType + ">(" + retVar + ");");
 
-                    returnVar += "Marshaled";
-
-                    // TODO: Generate marshalers if needed? Maybe for multidimensional arrays?
+                    retVar += "Marshaled";
                 }
                 else if (retValTransl.IsCastRequired)
                 {
-                    builder.AppendLine("\t" + retValTransl.NativeType + " " + returnVar + "Cast = static_cast<" + retValTransl.NativeType + ">(" + returnVar + ");");
+                    builder.AppendLine("\t" + retType + " " + retVar + "Cast = static_cast<" + retType + ">(" + retVar + ");");
 
-                    returnVar += "Cast";
+                    retVar += "Cast";
                 }
 
-                builder.AppendLine("\treturn " + returnVar + ";");
+                builder.AppendLine("\treturn " + retVar + ";");
             }
         }
 
+
+        /// <summary>
+        /// Generates include for bridge (for specified type) if not yet included.
+        /// </summary>
+        /// <param name="type">Type.</param>
+        /// <param name="builder">Output StringBuilder.</param>
         private void GenerateIlBridgeInclude(Type type, StringBuilder builder)
         {
             var t = type;
             if (t.IsArray && t.HasElementType)
             {
-                t = t.GetElementType();
+                t = t.GetElementType(); // get underlying type of array
             }
 
-            if (this.includedTypes.Contains(t)) return;
+            if (this.includedTypes.Contains(t)) return; // skip, if already included
 
             builder.AppendLine("#include \"" + WrapperILBridgeGenerator.GetFileName(t) + "\"");
 
             this.includedTypes.Add(t);
         }
 
+
+        #endregion
+
+        #region Helpers - public static
+
+        /// <summary>
+        /// Generation of opening namespaces
+        /// </summary>
+        /// <param name="type">Type.</param>
+        /// <param name="builder">Output StringBuilder.</param>
+        public static void GenerateNamespaces(Type type, StringBuilder builder)
+        {
+            builder.AppendLine("namespace " + Utils.GetWrapperProjectName() + " {"); // wrapper namespace
+
+            if (type.Namespace != null)
+            {
+                var namespaces = type.Namespace.Split('.');
+                foreach (var ns in namespaces)
+                {
+                    builder.AppendLine("namespace " + ns + " {"); // class namespaces
+                }
+            }
+            builder.AppendLine();
+        }
+
+        /// <summary>
+        /// Generation of ending (closing) namespaces
+        /// </summary>
+        /// <param name="type">Type.</param>
+        /// <param name="builder">Output StringBuilder.</param>
+        public static void GenerateEndNamespaces(Type type, StringBuilder builder)
+        {
+            builder.AppendLine();
+
+            if (type.Namespace != null)
+            {
+                var namespaces = type.Namespace.Split('.');
+                foreach (var ns in namespaces)
+                {
+                    builder.AppendLine("}"); // class namespaces
+                }
+            }
+            builder.AppendLine("}"); // wrapper namespace
+        }
+
+
         #endregion
 
 
-
+        /// <summary>
+        /// Gets output filename of this generator for type.
+        /// </summary>
+        /// <param name="type">Type</param>
+        /// <returns>Filename</returns>
         public static string GetFileName(Type type)
         {
             return Utils.GetWrapperFileNameFor(type) + ".cpp";

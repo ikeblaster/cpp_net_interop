@@ -252,7 +252,7 @@ namespace CppCliBridgeGenerator
             this.MinimumSize = new System.Drawing.Size(580, 400);
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "C++/CLI bridge generator";
+            this.Text = "C++/CLI bridge-wrapper generator";
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);

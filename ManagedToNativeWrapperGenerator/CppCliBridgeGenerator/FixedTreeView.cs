@@ -2,6 +2,9 @@
 
 namespace CppCliBridgeGenerator
 {
+    /// <summary>
+    /// TreeView with fixed/filtered doubleclick
+    /// </summary>
     public class FixedTreeView : TreeView
     {
         protected override void WndProc(ref Message m)
