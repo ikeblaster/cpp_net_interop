@@ -11,7 +11,7 @@ namespace CppCliBridgeGenerator
         /// Flags for different types of working with "types" (classes, structs, ...)
         /// </summary>
         [Flags]
-        public enum TFlag
+        public enum TFlags
         {
             None = 0,
             MarshalingRequired = 1,
@@ -37,21 +37,21 @@ namespace CppCliBridgeGenerator
             private readonly bool _ilObject;
 
 
-            public TypeTranslation(Type managedType, string nativeType, TFlag ti = TFlag.None)
+            public TypeTranslation(Type managedType, string nativeType, TFlags ti = TFlags.None)
             {
                 this._managedType = managedType;
                 this._nativeType = nativeType;
-                this._marshalingRequired = ti.HasFlag(TFlag.MarshalingRequired);
-                this._marshalingInContext = ti.HasFlag(TFlag.MarshalingInContext);
-                this._wrapperRequired = ti.HasFlag(TFlag.WrapperRequired);
-                this._castRequired = ti.HasFlag(TFlag.CastRequired);
-                this._ilObject = ti.HasFlag(TFlag.ILObject);
+                this._marshalingRequired = ti.HasFlag(TFlags.MarshalingRequired);
+                this._marshalingInContext = ti.HasFlag(TFlags.MarshalingInContext);
+                this._wrapperRequired = ti.HasFlag(TFlags.WrapperRequired);
+                this._castRequired = ti.HasFlag(TFlags.CastRequired);
+                this._ilObject = ti.HasFlag(TFlags.ILObject);
 
                 if (this._nativeType == null) this._nativeType = Utils.GetWrapperTypeFullNameFor(managedType) + "*";
                 if (this._wrapperRequired) this._ilbridgeType = Utils.GetWrapperILBridgeTypeFullNameFor(managedType) + "*";
             }
 
-            public TypeTranslation(Type managedType, TFlag ti = TFlag.None)
+            public TypeTranslation(Type managedType, TFlags ti = TFlags.None)
                 : this(managedType, null, ti)
             {
             }
@@ -123,7 +123,7 @@ namespace CppCliBridgeGenerator
             translations.Add(new TypeTranslation(typeof(double), "double"));
             translations.Add(new TypeTranslation(typeof(char), "wchar_t"));
             translations.Add(new TypeTranslation(typeof(bool), "bool"));
-            translations.Add(new TypeTranslation(typeof(string), "std::wstring", TFlag.MarshalingRequired));
+            translations.Add(new TypeTranslation(typeof(string), "std::wstring", TFlags.MarshalingRequired));
             translations.Add(new TypeTranslation(typeof(void), "void"));
             // INFO: More translations (decimal?)
 
@@ -166,8 +166,8 @@ namespace CppCliBridgeGenerator
                     tt = TranslateType(type.GetGenericArguments()[0]); // INFO: after all, seems to be safe (collection always have at least one "argument")
                 }
 
-                TFlag flags = TFlag.MarshalingRequired;
-                if (tt.IsILObject) flags |= TFlag.WrapperRequired | TFlag.ILObject;
+                TFlags flags = TFlags.MarshalingRequired;
+                if (tt.IsILObject) flags |= TFlags.WrapperRequired | TFlags.ILObject;
 
                 return new TypeTranslation(type, string.Format(format, tt.NativeType), flags);
             }
@@ -175,11 +175,11 @@ namespace CppCliBridgeGenerator
             // Enums
             if (type.IsEnum)
             {
-                return new TypeTranslation(type, Utils.GetWrapperTypeFullNameFor(type), TFlag.CastRequired | TFlag.WrapperRequired);
+                return new TypeTranslation(type, Utils.GetWrapperTypeFullNameFor(type), TFlags.CastRequired | TFlags.WrapperRequired);
             }
 
             // Classes / objects
-            return new TypeTranslation(type, TFlag.MarshalingRequired | TFlag.WrapperRequired | TFlag.ILObject);
+            return new TypeTranslation(type, TFlags.MarshalingRequired | TFlags.WrapperRequired | TFlags.ILObject);
         }
     }
 
