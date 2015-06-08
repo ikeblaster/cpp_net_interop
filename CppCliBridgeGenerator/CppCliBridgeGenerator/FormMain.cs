@@ -338,7 +338,7 @@ namespace CppCliBridgeGenerator
 
             try
             {
-                var generatorChain = new List<TypeGenerator>();
+                var generatorChain = new List<Generator>();
 
                 // prepare all generators
                 generatorChain.Add(new WrapperMockupGenerator(this.textBoxOutputFolder.Text, generatorChain)); // fixes missing files (forces to generate empty mockups for them)
