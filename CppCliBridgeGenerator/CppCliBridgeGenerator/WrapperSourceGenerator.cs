@@ -9,7 +9,7 @@ namespace CppCliBridgeGenerator
     /// <summary>
     /// Generator for bridge source file.
     /// </summary>
-    public class WrapperSourceGenerator : TypeGenerator
+    public class WrapperSourceGenerator : Generator
     {
         private readonly bool usesMarshalContext = false;
         private HashSet<Type> includedTypes;

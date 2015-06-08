@@ -12,9 +12,9 @@ namespace CppCliBridgeGenerator
     /// <summary>
     /// Generator for vcxproj file.
     /// </summary>
-    public class WrapperProjectGenerator : TypeGenerator
+    public class WrapperProjectGenerator : Generator
     {
-        private readonly List<TypeGenerator> generatorChain;
+        private readonly List<Generator> generatorChain;
         private readonly HashSet<Assembly> loadedAssemblies = new HashSet<Assembly>();
 
         /// <summary>
@@ -23,7 +23,7 @@ namespace CppCliBridgeGenerator
         /// </summary>
         /// <param name="outputFolder">Output folder.</param>
         /// <param name="generatorChain">Chain of all generators.</param>
-        public WrapperProjectGenerator(string outputFolder, List<TypeGenerator> generatorChain)
+        public WrapperProjectGenerator(string outputFolder, List<Generator> generatorChain)
             : base(outputFolder)
         {
             this.generatorChain = generatorChain;

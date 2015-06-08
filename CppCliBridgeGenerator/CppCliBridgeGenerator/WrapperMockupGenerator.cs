@@ -8,9 +8,9 @@ namespace CppCliBridgeGenerator
     /// <summary>
     /// Mockup generator - generates empty bridges using other generators.
     /// </summary>
-    public class WrapperMockupGenerator : TypeGenerator
+    public class WrapperMockupGenerator : Generator
     {
-        private readonly List<TypeGenerator> GeneratorChain;
+        private readonly List<Generator> GeneratorChain;
         private readonly Dictionary<Type, bool> UsedTypes = new Dictionary<Type, bool>();
 
         /// <summary>
@@ -18,7 +18,7 @@ namespace CppCliBridgeGenerator
         /// </summary>
         /// <param name="outputFolder">Output folder.</param>
         /// <param name="generatorChain">Chain of all generators.</param>
-        public WrapperMockupGenerator(string outputFolder, List<TypeGenerator> generatorChain)
+        public WrapperMockupGenerator(string outputFolder, List<Generator> generatorChain)
             : base(outputFolder)
         {
             this.GeneratorChain = generatorChain;

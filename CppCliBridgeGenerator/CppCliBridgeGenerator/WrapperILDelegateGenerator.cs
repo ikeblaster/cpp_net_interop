@@ -9,7 +9,7 @@ namespace CppCliBridgeGenerator
     /// <summary>
     /// Generator for IL bridge header file for delegates.
     /// </summary>
-    public class WrapperILDelegateGenerator : TypeGenerator
+    public class WrapperILDelegateGenerator : Generator
     {
         private HashSet<Type> includedTypes; 
         private StringBuilder outClass;

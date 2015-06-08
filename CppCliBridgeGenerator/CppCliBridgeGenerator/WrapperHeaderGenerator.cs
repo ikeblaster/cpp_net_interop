@@ -9,7 +9,7 @@ namespace CppCliBridgeGenerator
     /// <summary>
     /// Generator for main header file.
     /// </summary>
-    public class WrapperHeaderGenerator : TypeGenerator
+    public class WrapperHeaderGenerator : Generator
     {
         private HashSet<Type> declaredClasses;
         private XmlDocHelper xmlDoc;

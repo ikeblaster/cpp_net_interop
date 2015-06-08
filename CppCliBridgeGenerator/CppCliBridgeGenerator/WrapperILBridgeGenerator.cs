@@ -8,7 +8,7 @@ namespace CppCliBridgeGenerator
     /// <summary>
     /// Generator for IL bridge header file.
     /// </summary>
-    public class WrapperILBridgeGenerator : TypeGenerator
+    public class WrapperILBridgeGenerator : Generator
     {
         private readonly bool usesMarshalContext = false;
 

@@ -69,7 +69,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TypeGenerator.cs" />
+    <Compile Include="Generator.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="WrapperHeaderGenerator.cs" />
     <Compile Include="WrapperSourceGenerator.cs" />

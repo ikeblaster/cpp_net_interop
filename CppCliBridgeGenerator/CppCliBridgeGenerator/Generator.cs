@@ -8,7 +8,7 @@ namespace CppCliBridgeGenerator
     /// <summary>
     /// Prepared class abstract for generators.
     /// </summary>
-    public abstract class TypeGenerator
+    public abstract class Generator
     {
         private List<string> GeneratedFiles = new List<string>(); // list of generated files
         protected String OutputFolder; // set output folder
@@ -17,7 +17,7 @@ namespace CppCliBridgeGenerator
         /// New "empty" generator with set output folder.
         /// </summary>
         /// <param name="outputFolder">Output folder.</param>
-        protected TypeGenerator(String outputFolder) 
+        protected Generator(String outputFolder) 
         {
             this.OutputFolder = outputFolder;
         }
