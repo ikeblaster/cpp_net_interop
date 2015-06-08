@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Arrays</name>
+    </assembly>
+    <members>
+        <member name="T:MyCorp.TheProduct.SomeModule.Utilities.Arrays">
+            <summary>
+            Class description
+            </summary>
+        </member>
+        <member name="M:MyCorp.TheProduct.SomeModule.Utilities.Arrays.#ctor(System.String)">
+            <summary>
+            Ctor description
+            </summary>
+            <param name="name">Name</param>
+        </member>
+        <member name="M:MyCorp.TheProduct.SomeModule.Utilities.Arrays.#ctor(System.String,System.String)">
+            <summary>
+            Ctor description
+            </summary>
+            <param name="name">Name</param>
+            <param name="password">Password</param>
+        </member>
+        <member name="M:MyCorp.TheProduct.SomeModule.Utilities.Arrays.GetStrings1">
+            <summary>
+            Method description
+            </summary>
+        </member>
+        <member name="F:MyCorp.TheProduct.SomeModule.Utilities.Arrays.s">
+            <summary>
+            Field description
+            </summary>  
+        </member>
+        <member name="P:MyCorp.TheProduct.SomeModule.Utilities.Arrays.Name">
+            <summary>
+            Property description
+            </summary>          
+        </member>
+    </members>
+</doc>

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
  
 namespace MyCorp.TheProduct.SomeModule.Utilities
 { 
@@ -28,17 +29,29 @@ namespace MyCorp.TheProduct.SomeModule.Utilities
         public TestEnum lineending = TestEnum.DOS;
     }
 
+    /// <summary>
+    /// Class description
+    /// </summary>
     public class Arrays
-    {
-        
+    {      
         public delegate string PrintCallback(string str, int i);
         
         private PrintCallback callback;
    
-   
+        /// <summary>
+        /// Ctor description
+        /// </summary>
+        /// <param name="name">Name</param>
         public Arrays(string name) {
             
-        }       
+        }  
+
+   
+        /// <summary>
+        /// Ctor description
+        /// </summary>
+        /// <param name="name">Name</param>
+        /// <param name="password">Password</param>
         public Arrays(string name, string password) {
             
         }      
@@ -48,9 +61,15 @@ namespace MyCorp.TheProduct.SomeModule.Utilities
         public Arrays(bool cond, int[] ints) {
             
         }
-        
+
+        /// <summary>
+        /// Property description
+        /// </summary>          
         public string Name { get; set; }
-        
+    
+        /// <summary>
+        /// Method description
+        /// </summary>
         public string GetStrings1()
         {
             return String.Format("String {0}.", 1);
@@ -163,7 +182,9 @@ namespace MyCorp.TheProduct.SomeModule.Utilities
             if(last != null) last.Name = answer;
         }
         
-        
+        /// <summary>
+        /// Field description
+        /// </summary>  
         public Simple s;
         
         public void structSet(Simple s) 
@@ -198,6 +219,32 @@ namespace MyCorp.TheProduct.SomeModule.Utilities
             return s.Position;
         } 
  
+ 
+        public static List<int> listGetInts() 
+        {
+            return new List<int>() { 2, 3, 5, 7, 11, 13, 17 };
+        }  
+        
+        public static List<string> listGetString() 
+        {
+            return new List<string>() { "dva", "tri", "5", "7", "11", "13", "17" };
+        } 
+        
+        public static void listSetInts(List<int> list) 
+        {
+            foreach (var e in list)
+            {
+                Console.WriteLine(e);
+            }
+        }        
+        
+        public static void listSetStrings(List<string> list) 
+        {
+            foreach (var e in list)
+            {
+                Console.WriteLine(e);
+            }
+        }
 
     }
     

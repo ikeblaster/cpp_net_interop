@@ -1,0 +1,21 @@
+"DotNetZip is a FAST, FREE class library and toolset for manipulating zip files." (official website)
+
+Not everything from this library can be used in bridge, please choose carefully!
+Simple methods (like ZipFile constructor, AddFile method, etc.) works perfectly.
+
+
+Official website of library: http://dotnetzip.codeplex.com/
+
+
+
+
+`client.cpp` is a very simple example of using generated bridge. 
+It's purpose is to create a zip file called "out.zip" containing a file "client.cpp".
+
+You need to generate and compile a bridge with at least following methods: 
+  ZipFile(), AddFile(String fileName), Save(String fileName)
+
+
+
+
+   2015-06-06, Ike Blaster
