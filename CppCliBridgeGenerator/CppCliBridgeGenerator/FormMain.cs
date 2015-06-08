@@ -13,8 +13,7 @@ namespace CppCliBridgeGenerator
         public FormMain()
         {
             InitializeComponent();
-            this.textBoxOutputFolder.Text = @"c:\Users\Uzivatel\Documents\GitHub\cpp_net_interop\ManagedToNativeWrapperGenerator\TestDir\output\";
-            AddAssembly(@"c:\Users\Uzivatel\Documents\GitHub\cpp_net_interop\ManagedToNativeWrapperGenerator\TestDir\Arrays.dll");
+            this.textBoxOutputFolder.Text = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "output\\");
         }
 
         /// <summary>
