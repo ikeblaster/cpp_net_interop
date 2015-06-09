@@ -10,8 +10,8 @@ namespace CppCliBridgeGenerator
     /// </summary>
     public abstract class Generator
     {
-        private List<string> GeneratedFiles = new List<string>(); // list of generated files
-        protected String OutputFolder; // set output folder
+        private readonly List<string> GeneratedFiles = new List<string>(); // list of generated files
+        protected readonly string OutputFolder; // set output folder
 
         /// <summary>
         /// New "empty" generator with set output folder.
