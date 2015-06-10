@@ -340,7 +340,7 @@ namespace CppCliBridgeGenerator
             }
 
 
-            //try
+            try
             {
                 var generatorChain = new List<Generator>();
 
@@ -396,10 +396,10 @@ namespace CppCliBridgeGenerator
 
                 MessageBox.Show("Generation succesfully done!", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            //catch
-            //{
-            //    MessageBox.Show("Sorry, an error occured during generation.\nFeel free to contact the author to solve this issue.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //}
+            catch
+            {
+                MessageBox.Show("Sorry, an error occured during generation.\nFeel free to contact the author to solve this issue.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         /// <summary>
