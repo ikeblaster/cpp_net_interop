@@ -14,8 +14,6 @@ namespace CppCliBridgeGenerator
         {
             InitializeComponent();
             this.textBoxOutputFolder.Text = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath) ?? "", "output\\");
-            this.textBoxOutputFolder.Text = @"c:\Users\Uzivatel\Documents\GitHub\cpp_net_interop\CppCliBridgeGenerator\TestDir\output\";
-            AddAssembly(@"c:\Users\Uzivatel\Documents\GitHub\cpp_net_interop\CppCliBridgeGenerator\TestDir\output\Arrays.dll");
         }
 
         /// <summary>
