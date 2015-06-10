@@ -73,7 +73,7 @@ namespace CppCliBridgeGenerator
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CLRSupport>true</CLRSupport>
     <RuntimeLibrary>MD</RuntimeLibrary>
-    <OutDir>$(OutputPath)\..\</OutDir>
+    <OutDir>$(OutputPath)\bin\</OutDir>
   </PropertyGroup>
   <Import Project=""$(VCTargetsPath)\Microsoft.Cpp.props"" />
   <ItemGroup>");
