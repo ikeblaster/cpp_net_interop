@@ -28,7 +28,7 @@ template<typename T> struct remove_hat<T^> { typedef T type; };
 /// marshal_as - helper class
 template<typename TTo, typename TFrom>
 struct _marshal_helper {
-    static TTo marshal(const TFrom& from) 
+    inline static TTo marshal(const TFrom& from) 
     {
         return marshal_as<TTo>(from);
     }    
@@ -37,14 +37,14 @@ struct _marshal_helper {
 /// cli::array<> -> std::vector<> helpers
 template<typename TTo, typename TFrom>
 struct _marshal_helper<cli::array<TTo>^, TFrom> {
-    static cli::array<TTo>^ marshal(const TFrom& from)
+    inline static cli::array<TTo>^ marshal(const TFrom& from)
     {
         return marshal_as_1d<TTo>(from);
     }    
 };
 template<typename TTo, typename TFrom>
 struct _marshal_helper<cli::array<TTo,2>^, TFrom> {
-    static cli::array<TTo,2>^ marshal(const TFrom& from)
+    inline static cli::array<TTo,2>^ marshal(const TFrom& from)
     {
         return marshal_as_2d<TTo>(from);
     }    
@@ -52,43 +52,50 @@ struct _marshal_helper<cli::array<TTo,2>^, TFrom> {
 
 /// std::vector<> -> CLR Collections helpers
 template<typename TTo, typename TFrom>
+struct _marshal_helper<System::Collections::Generic::ICollection<TTo>^, TFrom> {
+    inline static System::Collections::Generic::ICollection<TTo>^ marshal(const TFrom& from)
+    {
+        return marshal_as_clr<System::Collections::Generic::List<TTo>^>(from); // use List as default ICollection
+    }    
+}; 
+template<typename TTo, typename TFrom>
 struct _marshal_helper<System::Collections::Generic::List<TTo>^, TFrom> {
-    static System::Collections::Generic::List<TTo>^ marshal(const TFrom& from)
+    inline static System::Collections::Generic::List<TTo>^ marshal(const TFrom& from)
     {
         return marshal_as_clr<System::Collections::Generic::List<TTo>^>(from);
     }    
 }; 
 template<typename TTo, typename TFrom>
 struct _marshal_helper<System::Collections::Generic::LinkedList<TTo>^, TFrom> {
-    static System::Collections::Generic::LinkedList<TTo>^ marshal(const TFrom& from)
+    inline static System::Collections::Generic::LinkedList<TTo>^ marshal(const TFrom& from)
     {
         return marshal_as_clr<System::Collections::Generic::LinkedList<TTo>^>(from);
     }    
 }; 
 template<typename TTo, typename TFrom>
 struct _marshal_helper<System::Collections::Generic::Queue<TTo>^, TFrom> {
-    static System::Collections::Generic::Queue<TTo>^ marshal(const TFrom& from)
+    inline static System::Collections::Generic::Queue<TTo>^ marshal(const TFrom& from)
     {
         return marshal_as_clr<System::Collections::Generic::Queue<TTo>^>(from);
     }    
 }; 
 template<typename TTo, typename TFrom>
 struct _marshal_helper<System::Collections::Generic::HashSet<TTo>^, TFrom> {
-    static System::Collections::Generic::HashSet<TTo>^ marshal(const TFrom& from)
+    inline static System::Collections::Generic::HashSet<TTo>^ marshal(const TFrom& from)
     {
         return marshal_as_clr<System::Collections::Generic::HashSet<TTo>^>(from);
     }    
 }; 
 template<typename TTo, typename TFrom>
 struct _marshal_helper<System::Collections::Generic::SortedSet<TTo>^, TFrom> {
-    static System::Collections::Generic::SortedSet<TTo>^ marshal(const TFrom& from)
+    inline static System::Collections::Generic::SortedSet<TTo>^ marshal(const TFrom& from)
     {
         return marshal_as_clr<System::Collections::Generic::SortedSet<TTo>^>(from);
     }    
 }; 
 template<typename TTo, typename TFrom>
 struct _marshal_helper<System::Collections::Generic::Stack<TTo>^, TFrom> {
-    static System::Collections::Generic::Stack<TTo>^ marshal(const TFrom& from)
+    inline static System::Collections::Generic::Stack<TTo>^ marshal(const TFrom& from)
     {
         return marshal_as_clr<System::Collections::Generic::Stack<TTo>^>(from);
     }    
@@ -100,16 +107,11 @@ struct _marshal_helper<System::Collections::Generic::Stack<TTo>^, TFrom> {
 /// same-type copy - helper class
 template<typename TTo>
 struct _marshal_helper<TTo, TTo> {
-    static TTo marshal(const TTo& from)
+    inline static TTo marshal(const TTo& from)
     {
         return from;
     }    
 };
-
-template<class T, class U> 
-bool isinst(U u) {
-    return dynamic_cast< T >(u) != nullptr;
-}
 
 
 

@@ -13,7 +13,9 @@ namespace CppCliBridgeGenerator
         public FormMain()
         {
             InitializeComponent();
-            this.textBoxOutputFolder.Text = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "output\\");
+            this.textBoxOutputFolder.Text = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath) ?? "", "output\\");
+            this.textBoxOutputFolder.Text = @"c:\Users\Uzivatel\Documents\GitHub\cpp_net_interop\CppCliBridgeGenerator\TestDir\output\";
+            AddAssembly(@"c:\Users\Uzivatel\Documents\GitHub\cpp_net_interop\CppCliBridgeGenerator\TestDir\output\Arrays.dll");
         }
 
         /// <summary>
@@ -127,6 +129,8 @@ namespace CppCliBridgeGenerator
             foreach (var method in methods)
             {
                 if (method.DeclaringType != type) continue; // INFO: skip inherited methods - could be controlled via checkbox
+                if (method.IsSpecialName && method.DeclaringType.GetProperties().FirstOrDefault(p => p.GetSetMethod() == method) == null) continue; // INFO: skip event handlers (but leave property methods)
+                if (method.Name == "Dispose") continue; // INFO: skip dispose method - not available in C++/CLI (use delete instead, if needed)
 
                 img = "Method.png";
                 if (method.IsStatic) img = "MethodStatic.png";
@@ -265,7 +269,9 @@ namespace CppCliBridgeGenerator
         /// </summary>
         private void treeViewAssemblies_DragDrop(object sender, DragEventArgs e)
         {
-            string[] files = e.Data.GetData(DataFormats.FileDrop) as string[]; // get all dropped files (or other junk)
+            var files = e.Data.GetData(DataFormats.FileDrop) as string[]; // get all dropped files (or other junk)
+            if (files == null) return;
+
             foreach (string file in files)
             {
                 if (!File.Exists(file)) continue; // accept only existing files
@@ -336,7 +342,7 @@ namespace CppCliBridgeGenerator
             }
 
 
-            try
+            //try
             {
                 var generatorChain = new List<Generator>();
 
@@ -364,7 +370,6 @@ namespace CppCliBridgeGenerator
 
                         var type = (Type) nodeType.Tag;
 
-
                         // call EnumLoad or ClassLoad function on generators
                         if (type.IsEnum)
                         {
@@ -376,7 +381,7 @@ namespace CppCliBridgeGenerator
                         }
                         else
                         {
-                            var chcked = nodeType.Nodes.OfType<TreeNode>().Where(n => n.Checked); // get checked parts of class/struct
+                            var chcked = nodeType.Nodes.OfType<TreeNode>().Where(n => n.Checked).ToList(); // get checked parts of class/struct
 
                             var fields = chcked.Where(n => n.Tag is FieldInfo).Select(n => n.Tag).Cast<FieldInfo>().ToArray(); // get fields
                             var ctors = chcked.Where(n => n.Tag is ConstructorInfo).Select(n => n.Tag).Cast<ConstructorInfo>().ToArray(); // get constructors
@@ -393,10 +398,10 @@ namespace CppCliBridgeGenerator
 
                 MessageBox.Show("Generation succesfully done!", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            catch
-            {
-                MessageBox.Show("Sorry, an error occured during generation.\nFeel free to contact the author to solve this issue.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            //catch
+            //{
+            //    MessageBox.Show("Sorry, an error occured during generation.\nFeel free to contact the author to solve this issue.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //}
         }
 
         /// <summary>

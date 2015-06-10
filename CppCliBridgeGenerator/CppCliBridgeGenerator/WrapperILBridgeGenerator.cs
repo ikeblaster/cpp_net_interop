@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
@@ -49,7 +48,7 @@ namespace CppCliBridgeGenerator
         /// <param name="methods">selected methods.</param>
         public override void ClassLoad(Type type, FieldInfo[] fields, ConstructorInfo[] ctors, MethodInfo[] methods)
         {
-            if (typeof(MulticastDelegate).IsAssignableFrom(type)) // skip delegates (processed in another generator)
+            if (typeof(MulticastDelegate).IsAssignableFrom(type) || type.IsGenericTypeDefinition) // skip delegates (processed in another generator)
                 return;
 
             var builder = new StringBuilder();
@@ -60,7 +59,8 @@ namespace CppCliBridgeGenerator
             builder.AppendLine("#include <msclr\\auto_gcroot.h>");
             builder.AppendLine();
 
-            builder.AppendLine("#using \"" + type.Module.Name + "\"");
+            if (type.Module.Name != "mscorlib.dll")
+                builder.AppendLine("#using \"" + type.Module.Name + "\"");
             builder.AppendLine("#include \"" + WrapperHeaderGenerator.GetFileName(type) + "\"");
             builder.AppendLine();
 
@@ -88,7 +88,7 @@ namespace CppCliBridgeGenerator
             builder.AppendLine("\tpublic:");
 
             // wrap instance in gcroot if needed (classes), or leave it as it is (structs)
-            if (type.IsValueType) 
+            if (type.IsValueType && type.IsLayoutSequential && false) // INFO: value structs disabled ATM!  
                 builder.AppendLine("\t\t" + Utils.GetCppCliTypeFullNameFor(type) + " __Impl;");
             else 
                 builder.AppendLine("\t\tmsclr::auto_gcroot<" + Utils.GetCppCliTypeFullNameFor(type) + "^> __Impl;");
@@ -125,10 +125,10 @@ namespace CppCliBridgeGenerator
             builder.AppendLine("template <typename TTo> ");
             builder.AppendLine("inline " + Utils.GetCppCliTypeFor(type) + " marshal_as(" + retValTransl.NativeType + " const from)");
             builder.AppendLine("{");
-            if (type.IsValueType)
+            if (type.IsValueType && type.IsLayoutSequential && false) // INFO: value structs disabled ATM!  
                 builder.AppendLine("\treturn from->__IL->__Impl;");
             else
-                builder.AppendLine("\treturn from->__IL->__Impl.get();");
+                builder.AppendLine("\treturn (" + Utils.GetCppCliTypeFor(type) + ") from->__IL->__Impl.get();");
             builder.AppendLine("}");
         }
 

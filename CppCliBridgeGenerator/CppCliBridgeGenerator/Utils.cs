@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Reflection;
 
 namespace CppCliBridgeGenerator
@@ -15,7 +16,10 @@ namespace CppCliBridgeGenerator
         /// <returns>Formatted fullname</returns>
         public static string GetCppCliTypeFullNameFor(Type type)
         {
-            return "::" + type.FullName.Replace(".", "::").Replace("+","::").Split('`')[0]; // TODO: generic classes usage
+            string fullname = "::" + type.FullName.Replace(".", "::").Replace("+", "::").Split('`')[0];
+            if (type.IsGenericType) fullname += "<" + string.Join(", ", type.GetGenericArguments().Select(arg => GetCppCliTypeFor(arg))) + ">";
+
+            return fullname;
         }
 
         /// <summary>
@@ -51,15 +55,11 @@ namespace CppCliBridgeGenerator
             string cppcli;
 
             // Generic types, but not collections (which are translated)
-            if (type.IsGenericType && type.GetInterface("ICollection") != null)
+            if (type.IsArray) // Arrays
             {
-                cppcli = GetCppCliTypeFullNameFor(type) + "<" + GetCppCliTypeFor(type.GetGenericArguments()[0]) + ">";
-            }
-            else if (type.IsArray) // Arrays
-            {
-                cppcli = "array<" 
-                                + GetCppCliTypeFor(type.GetElementType()) 
-                                + (type.GetArrayRank() > 1 ? ("," + type.GetArrayRank()) : "") 
+                cppcli = "array<"
+                                + GetCppCliTypeFor(type.GetElementType())
+                                + (type.GetArrayRank() > 1 ? ("," + type.GetArrayRank()) : "")
                                 + ">";
             }
             else // Everything else
@@ -122,7 +122,12 @@ namespace CppCliBridgeGenerator
         /// <returns>Formatted name</returns>
         public static string GetWrapperTypeNameFor(Type type)
         {
-            return type.Name.Replace('.', '_');
+            string name = type.Name.Replace("+", "_").Split('`')[0];
+
+            if(type.IsGenericType)
+                name += "_" + string.Join("_", type.GetGenericArguments().Select(arg => GetCppCliTypeFullNameFor(arg).Replace("::", "_")));
+
+            return name;
         }
 
         /// <summary>
@@ -137,7 +142,7 @@ namespace CppCliBridgeGenerator
 
 
         /// <summary>
-        ///  Get bridge fullname for type.
+        /// Get bridge fullname for type.
         /// </summary>
         /// <param name="type">Type</param>
         /// <returns>Formatted name</returns>
@@ -164,7 +169,7 @@ namespace CppCliBridgeGenerator
         /// <returns>Filename</returns>
         public static string GetWrapperFileNameFor(Type type)
         {
-            return GetWrapperProjectName() + "_" + GetWrapperTypeNameFor(type);
+            return GetWrapperProjectName() + "_" + GetCppCliNamespacePrefixFor(type).Replace("::","_") + GetWrapperTypeNameFor(type);
         }
         /// <summary>
         /// Get IL bridge filename for type without extension.
@@ -173,7 +178,7 @@ namespace CppCliBridgeGenerator
         /// <returns>Filename</returns>
         public static string GetWrapperILBridgeFileNameFor(Type type)
         {
-            return GetWrapperProjectName() + "_" + GetWrapperILBridgeTypeNameFor(type);
+            return GetWrapperProjectName() + "_" + GetCppCliNamespacePrefixFor(type).Replace("::", "_") + GetWrapperILBridgeTypeNameFor(type);
         }
 
 

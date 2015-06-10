@@ -33,8 +33,9 @@ namespace CppCliBridgeGenerator
         /// <param name="methods">selected methods.</param>
         public override void ClassLoad(Type type, FieldInfo[] fields, ConstructorInfo[] ctors, MethodInfo[] methods)
         {
-            if (!typeof(MulticastDelegate).IsAssignableFrom(type)) // accept only delegates
+            if (!typeof(MulticastDelegate).IsAssignableFrom(type) || type.IsGenericTypeDefinition) // accept only non-generic delegates
                 return;
+
 
             this.outHeader = new StringBuilder();
             this.outClass = new StringBuilder();
@@ -157,16 +158,21 @@ namespace CppCliBridgeGenerator
             // parameters of delegate
             GenerateParametersList(method.GetParameters(), ref nativeParList);
 
+            var varTTo = Utils.GetCppCliTypeFor(type);
+            var varTFrom = retTypeTransl.NativeType + " (*)(" + string.Join(", ", nativeParList) + ")"; // callback signature
             var varCallback = retTypeTransl.NativeType + " (*from)(" + string.Join(", ", nativeParList) + ")"; // callback signature
 
             // template - wrap callback
             builder.AppendLine();
-            builder.AppendLine("template <typename TTo> ");
-            builder.AppendLine("inline " + Utils.GetCppCliTypeFor(type) + " marshal_as(" + varCallback + ")");
+            builder.AppendLine("template <>");
+            builder.AppendLine("struct _marshal_helper<" + varTTo + ", " +varTFrom+">");
             builder.AppendLine("{");
-            builder.AppendLine("\t" + Utils.GetWrapperILBridgeTypeFullNameFor(type) + "^ bridge = gcnew " + Utils.GetWrapperILBridgeTypeFullNameFor(type) + "(from);");
-            builder.AppendLine("\treturn gcnew " + Utils.GetCppCliTypeFullNameFor(type) + "(bridge, &" + Utils.GetWrapperILBridgeTypeFullNameFor(type) + "::Invoke);");
-            builder.AppendLine("}");
+            builder.AppendLine("\tinline static " + varTTo + " marshal(" + varCallback + ")");
+            builder.AppendLine("\t{");
+            builder.AppendLine("\t\t" + Utils.GetWrapperILBridgeTypeFullNameFor(type) + "^ bridge = gcnew " + Utils.GetWrapperILBridgeTypeFullNameFor(type) + "(from);");
+            builder.AppendLine("\t\treturn gcnew " + Utils.GetCppCliTypeFullNameFor(type) + "(bridge, &" + Utils.GetWrapperILBridgeTypeFullNameFor(type) + "::Invoke);");
+            builder.AppendLine("\t}");
+            builder.AppendLine("};");
         }
 
         /// <summary>

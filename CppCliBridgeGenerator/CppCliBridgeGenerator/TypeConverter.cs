@@ -106,6 +106,13 @@ namespace CppCliBridgeGenerator
         /// </summary>
         static Dictionary<Type, TypeTranslation> _standardTranslations = new Dictionary<Type, TypeTranslation>();
 
+
+        /// <summary>
+        /// Set of collections supported directly by marshaller
+        /// </summary>
+        static HashSet<Type> _marshallableCollections = new HashSet<Type>();
+
+
         /// <summary>
         /// Type converter/translator static initializer.
         /// Initializes all known blittable types (ints/double/...).
@@ -133,7 +140,21 @@ namespace CppCliBridgeGenerator
             {
                 _standardTranslations.Add(translation.ManagedType, translation);
             }
+
+            _marshallableCollections.Add(typeof(ICollection<>));
+            _marshallableCollections.Add(typeof(List<>));
+            _marshallableCollections.Add(typeof(LinkedList<>));
+            _marshallableCollections.Add(typeof(Queue<>));
+            _marshallableCollections.Add(typeof(HashSet<>));
+            _marshallableCollections.Add(typeof(SortedSet<>));
+            _marshallableCollections.Add(typeof(Stack<>));
         }
+
+        public static bool IsMarshalledCollection(Type type)
+        {
+            return type.IsGenericType && _marshallableCollections.Contains(type.GetGenericTypeDefinition());
+        }  
+
 
         /// <summary>
         /// Translates type from managed to unmanaged version.
@@ -149,7 +170,7 @@ namespace CppCliBridgeGenerator
                 return translation;
 
             // Arrays or collections
-            if ((type.IsArray && type.HasElementType) || (type.IsGenericType && type.GetInterface("ICollection") != null))
+            if ((type.IsArray && type.HasElementType) || (IsMarshalledCollection(type)))
             {
                 TypeTranslation tt;
 
@@ -177,7 +198,7 @@ namespace CppCliBridgeGenerator
             // Enums
             if (type.IsEnum)
             {
-                return new TypeTranslation(type, Utils.GetWrapperTypeFullNameFor(type), TFlags.CastRequired | TFlags.WrapperRequired);
+                return new TypeTranslation(type, Utils.GetWrapperTypeFullNameFor(type) + "::" + type.Name + "Type", TFlags.CastRequired | TFlags.WrapperRequired);
             }
 
             // Classes / objects

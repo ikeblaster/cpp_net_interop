@@ -35,7 +35,7 @@ namespace CppCliBridgeGenerator
         /// <param name="methods">selected methods.</param>
         public override void ClassLoad(Type type, FieldInfo[] fields, ConstructorInfo[] ctors, MethodInfo[] methods)
         {
-            if (typeof(MulticastDelegate).IsAssignableFrom(type))
+            if (typeof(MulticastDelegate).IsAssignableFrom(type) || type.IsGenericTypeDefinition)
                 return;
 
             this.outHeader = new StringBuilder();
@@ -82,11 +82,8 @@ namespace CppCliBridgeGenerator
 
             foreach (var ctor in ctors)
             {
-                if (ctor.DeclaringType == type)
-                {
-                    GenerateCtor(ctor, this.outClass); // generate one constructor
-                    this.outClass.AppendLine();
-                }
+                GenerateCtor(ctor, this.outClass); // generate one constructor
+                this.outClass.AppendLine();
             }
 
             // contrustor for valuetype classes (used for struct wrappers)
@@ -94,6 +91,7 @@ namespace CppCliBridgeGenerator
             {
                 this.outClass.AppendLine(className + "::" + className + "() {");
                 this.outClass.AppendLine("\t__IL = new " + Utils.GetWrapperILBridgeTypeNameFor(type) + ";");
+                if (!type.IsLayoutSequential || true) this.outClass.AppendLine("\t__IL->__Impl = gcnew " + Utils.GetCppCliTypeFullNameFor(type) + ";"); // INFO: value structs disabled ATM! = always add instance 
                 if (this.usesMarshalContext) this.outClass.AppendLine("\t__IL->__Context = gcnew marshal_context;");
                 this.outClass.AppendLine("}");
                 this.outClass.AppendLine();
@@ -156,11 +154,8 @@ namespace CppCliBridgeGenerator
         {
             foreach (var field in fields)
             {
-                if (field.DeclaringType == type) // skip inherited
-                {
-                    this.outClass.AppendLine();
-                    GenerateField(field, this.outClass); 
-                }
+                this.outClass.AppendLine();
+                GenerateField(field, this.outClass);
             }
         }
 
@@ -189,7 +184,7 @@ namespace CppCliBridgeGenerator
 
                 if (field.IsStatic)
                     builder.Append(Utils.GetCppCliTypeFullNameFor(field.DeclaringType) + "::");
-                else if(field.DeclaringType != null && field.DeclaringType.IsValueType)
+                else if (field.DeclaringType != null && field.DeclaringType.IsValueType && field.DeclaringType.IsLayoutSequential && false) // INFO: value structs disabled ATM!  
                     builder.Append("__IL->__Impl.");
                 else
                     builder.Append("__IL->__Impl->");
@@ -203,7 +198,7 @@ namespace CppCliBridgeGenerator
             }
 
             // SETTER
-            if (!field.IsInitOnly)
+            if (!field.IsInitOnly && !field.IsLiteral)
             {
                 builder.AppendLine();
 
@@ -217,7 +212,7 @@ namespace CppCliBridgeGenerator
 
                 if (field.IsStatic)
                     builder.Append(Utils.GetCppCliTypeFullNameFor(field.DeclaringType) + "::");
-                else if (field.DeclaringType != null && field.DeclaringType.IsValueType)
+                else if (field.DeclaringType != null && field.DeclaringType.IsValueType && field.DeclaringType.IsLayoutSequential)
                     builder.Append("__IL->__Impl.");
                 else
                     builder.Append("__IL->__Impl->");
@@ -241,11 +236,8 @@ namespace CppCliBridgeGenerator
         {
             foreach (var method in methods)
             {
-                if (method.DeclaringType == type) // skip inherited
-                {
-                    this.outClass.AppendLine();
-                    GenerateMethod(method, this.outClass);
-                }
+                this.outClass.AppendLine();
+                GenerateMethod(method, this.outClass);
             }
         }
 
@@ -342,7 +334,9 @@ namespace CppCliBridgeGenerator
             // or get/set according field (for properties)
             else
             {
-                var property = method.DeclaringType.GetProperty(method.Name.Substring(4));
+                var property = method.DeclaringType.GetProperties().FirstOrDefault(p => p.GetSetMethod() == method);
+                if (property == null) return;
+
                 builder.Append(property.Name);
                 if (method.GetParameters().Length == 1) builder.Append(" = " + Utils.GetLocalTempNameFor(method.GetParameters().First()));
                 builder.AppendLine(";");
@@ -353,8 +347,6 @@ namespace CppCliBridgeGenerator
 
 
         #region Helpers
-
-
 
         /// <summary>
         /// Generation of parameters for methods/constructors.
@@ -472,9 +464,13 @@ namespace CppCliBridgeGenerator
         private void GenerateIlBridgeInclude(Type type, StringBuilder builder)
         {
             var t = type;
-            if (t.IsArray && t.HasElementType)
+            while (t.IsArray && t.HasElementType)
             {
                 t = t.GetElementType(); // get underlying type of array
+            }
+            while (TypeConverter.IsMarshalledCollection(t)) // collection element type
+            {
+                t = t.GetGenericArguments()[0];
             }
 
             if (this.includedTypes.Contains(t)) return; // skip, if already included

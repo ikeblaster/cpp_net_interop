@@ -1,10 +1,11 @@
 #pragma comment(lib, "Wrapper")
 #include <stdlib.h>
 #include <iostream>
-#include "Wrapper_Arrays.h"
-#include "Wrapper_Simple.h"
-#include "Wrapper_Stuff.h"
-#include "Wrapper_TestEnum.h"
+#include "Wrapper_MyCorp_TheProduct_SomeModule_Utilities_Arrays.h"
+#include "Wrapper_MyCorp_TheProduct_SomeModule_Utilities_Simple.h"
+#include "Wrapper_MyCorp_TheProduct_SomeModule_Utilities_Stuff.h"
+#include "Wrapper_MyCorp_TheProduct_SomeModule_Utilities_TestEnum.h"
+#include "Wrapper_MyCorp_TheProduct_SomeModule_Utilities_Genericclass__System_String.h"
  
 using namespace std;
 using namespace Wrapper::MyCorp::TheProduct::SomeModule::Utilities;
@@ -100,6 +101,15 @@ int main()
     
     wcout << le << endl;
     wcout << stuff2->get_Name() << endl; 
+    
+    
+    
+    wcout << endl << L"Generic classes" << endl << "====================" << endl;
+    
+    Genericclass__System_String* gcls = Arrays::GetGenericWithString();
+    
+    gcls->print();
+    gcls->print2();
 
     
     return 0;

@@ -10,7 +10,7 @@ namespace CppCliBridgeGenerator
     /// </summary>
     public abstract class Generator
     {
-        private readonly List<string> GeneratedFiles = new List<string>(); // list of generated files
+        private readonly List<string> generatedFiles = new List<string>(); // list of generated files
         protected readonly string OutputFolder; // set output folder
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace CppCliBridgeGenerator
         /// <returns>List of files.</returns>
         public List<string> GetGeneratedFiles()
         {
-            return this.GeneratedFiles;
+            return this.generatedFiles;
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace CppCliBridgeGenerator
         protected void WriteToFile(String text, String filename)
         {
             File.WriteAllText(Path.Combine(this.OutputFolder, filename), text);
-            this.GeneratedFiles.Add(filename);
+            this.generatedFiles.Add(filename);
         }
 
 

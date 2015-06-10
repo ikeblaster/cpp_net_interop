@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
  
 namespace MyCorp.TheProduct.SomeModule.Utilities
 { 
@@ -28,9 +29,27 @@ namespace MyCorp.TheProduct.SomeModule.Utilities
         public int[] IntsField;
         public TestEnum lineending = TestEnum.DOS;
     }
+    
+    
+    public class Genericclass<T>
+    {
+        private T field;
+        
+        public Genericclass(T value) {
+            this.field = value;
+        }
+        
+        public void print() {
+            Console.WriteLine(this.field);
+        }        
+        
+        public void print2() {
+            Console.WriteLine(this.field + " 2");
+        }
+    }
 
     /// <summary>
-    /// Class description
+    /// Popis tridy
     /// </summary>
     public class Arrays
     {      
@@ -39,19 +58,23 @@ namespace MyCorp.TheProduct.SomeModule.Utilities
         private PrintCallback callback;
    
         /// <summary>
-        /// Ctor description
+        /// Popis ctoru
         /// </summary>
         /// <param name="name">Name</param>
         public Arrays(string name) {
             
         }  
+        
+        public static Genericclass<string> GetGenericWithString() {
+            return new Genericclass<string>("Hello world");
+        }
 
    
         /// <summary>
-        /// Ctor description
+        /// Popis ctoru
         /// </summary>
         /// <param name="name">Name</param>
-        /// <param name="password">Password</param>
+        /// <param name="password">Heslo</param>
         public Arrays(string name, string password) {
             
         }      
@@ -63,12 +86,12 @@ namespace MyCorp.TheProduct.SomeModule.Utilities
         }
 
         /// <summary>
-        /// Property description
+        /// Popis property
         /// </summary>          
         public string Name { get; set; }
     
         /// <summary>
-        /// Method description
+        /// Popis metody
         /// </summary>
         public string GetStrings1()
         {
@@ -183,7 +206,7 @@ namespace MyCorp.TheProduct.SomeModule.Utilities
         }
         
         /// <summary>
-        /// Field description
+        /// Popis field
         /// </summary>  
         public Simple s;
         

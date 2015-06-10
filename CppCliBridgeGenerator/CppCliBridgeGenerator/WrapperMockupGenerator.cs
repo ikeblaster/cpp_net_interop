@@ -10,8 +10,12 @@ namespace CppCliBridgeGenerator
     /// </summary>
     public class WrapperMockupGenerator : Generator
     {
-        private readonly List<Generator> GeneratorChain;
-        private readonly Dictionary<Type, bool> UsedTypes = new Dictionary<Type, bool>();
+        private readonly List<Generator> generatorChain;
+        private readonly Dictionary<Type, bool> usedTypes = new Dictionary<Type, bool>();
+
+        private readonly Dictionary<Type, FieldInfo[]> preselectedFields = new Dictionary<Type, FieldInfo[]>();
+        private readonly Dictionary<Type, ConstructorInfo[]> preselectedCtors = new Dictionary<Type, ConstructorInfo[]>();
+        private readonly Dictionary<Type, MethodInfo[]> preselectedMethods = new Dictionary<Type, MethodInfo[]>();
 
         /// <summary>
         /// Mockup generator - generates empty bridges using other generators (for used but not included types).
@@ -21,8 +25,21 @@ namespace CppCliBridgeGenerator
         public WrapperMockupGenerator(string outputFolder, List<Generator> generatorChain)
             : base(outputFolder)
         {
-            this.GeneratorChain = generatorChain;
+            this.generatorChain = generatorChain;
         }
+
+        /// <summary>
+        /// Called for enums.
+        /// </summary>
+        /// <param name="type">Type with enum.</param>
+        /// <param name="fields">Selected fields of enum.</param>
+        public override void EnumLoad(Type type, FieldInfo[] fields)
+        {
+            AddUsedType(type, true);
+
+            fields.ForEach(f => AddUsedType(f.FieldType, false)); // add field types as used and NOT declared
+        }
+
 
         /// <summary>
         /// Called for classes. Adds every found type as used.
@@ -33,6 +50,14 @@ namespace CppCliBridgeGenerator
         /// <param name="methods">selected methods.</param>
         public override void ClassLoad(Type type, FieldInfo[] fields, ConstructorInfo[] ctors, MethodInfo[] methods)
         {
+            if (type.IsGenericTypeDefinition)
+            {
+                this.preselectedFields.Add(type, fields);
+                this.preselectedCtors.Add(type, ctors);
+                this.preselectedMethods.Add(type, methods);
+                return;
+            }
+
             AddUsedType(type, true); // add this class as used and declared
 
             fields.ForEach(f => AddUsedType(f.FieldType, false)); // add field types as used and NOT declared
@@ -56,26 +81,36 @@ namespace CppCliBridgeGenerator
             if (typeof (MulticastDelegate).IsAssignableFrom(type))
             {
                 var method = type.GetMethod("Invoke");
-                AddUsedType(method.ReturnType, declared); // add delegate return type
-                method.GetParameters().ForEach(p => AddUsedType(p.ParameterType, declared)); // add delegate parameter types
+                AddUsedType(method.ReturnType, false); // add delegate return type
+                method.GetParameters().ForEach(p => AddUsedType(p.ParameterType, false)); // add delegate parameter types
             }
 
             if (type.HasElementType)
             {
-                AddUsedType(type.GetElementType(), declared); // add underlying element type - arrays
+                AddUsedType(type.GetElementType(), false); // add underlying element type - arrays
                 return;
             }
 
             if (type.IsArray)
                 return;
 
+            if (TypeConverter.IsMarshalledCollection(type)) // collection element type
+            {
+                AddUsedType(type.GetGenericArguments()[0], false);
+                return;
+            }
+
             // translate type
             var trans = TypeConverter.TranslateType(type);
+            if (!trans.IsWrapperRequired) // add only types, which needs wrapper/bridge
+                return;
 
-            if (trans.IsWrapperRequired && !this.UsedTypes.ContainsKey(type)) // add only types, which needs wrapper/bridge
-                this.UsedTypes.Add(type, false);
 
-            if (declared && this.UsedTypes.ContainsKey(type)) this.UsedTypes[type] = true; // mark as declared
+            if (!this.usedTypes.ContainsKey(type)) 
+                this.usedTypes.Add(type, false);
+
+            if (declared) 
+                this.usedTypes[type] = true; // mark as declared
         }
 
         /// <summary>
@@ -83,31 +118,62 @@ namespace CppCliBridgeGenerator
         /// </summary>
         public override void GeneratorFinalize()
         {
-            var notFound = this.UsedTypes.Where(t => !t.Value).Select(t => t.Key); // find not declared types
-            var chain = this.GeneratorChain.Where(f => f != this); // remove this generator from chain
+            var chain = this.generatorChain;
 
             // empty fields/ctors/methods selections = mockup
-            var emptyFields = new FieldInfo[] {};
-            var emptyCtors = new ConstructorInfo[] {};
-            var emptyMethods = new MethodInfo[] {};
+            var emptyFields = new FieldInfo[] { };
+            var emptyCtors = new ConstructorInfo[] { };
+            var emptyMethods = new MethodInfo[] { };
 
-            // process everything through chain
-            foreach (var type in notFound)
+            int depth = 0;
+
+            // repeat until something is missing to depth 5
+            while (this.usedTypes.Any(t => !t.Value) && depth++ < 10)
             {
-                foreach (var gen in chain)
+                var types = this.usedTypes.Where(t => t.Value == false).Select(t => t.Key).ToList();
+
+                // process everything through chain
+                foreach (var type in types)
                 {
-                    gen.AssemblyLoad(type.Assembly);
+                    var fields = emptyFields;
+                    var ctors = emptyCtors;
+                    var methods = emptyMethods;
 
-                    if (type.IsEnum)
-                        gen.EnumLoad(type, type.GetFields(BindingFlags.Public | BindingFlags.Static));
-                    else if (type.IsClass)
-                        gen.ClassLoad(type, emptyFields, emptyCtors, emptyMethods);
-                    else
-                        gen.ClassLoad(type, type.GetFields(BindingFlags.Public | BindingFlags.Static), emptyCtors, emptyMethods); // structs
+                    // get preselected values for generic types
+                    if (type.IsGenericType)
+                    {
+                        Type genericType = type.GetGenericTypeDefinition();
+
+                        // INFO: preselected fields for generic classes - can be problematic with generic methods
+                        // find preselected fields/ctors/methods in current type - no better solution than using ToString?
+                        if (this.preselectedFields.ContainsKey(genericType))
+                        {
+                            fields = type.GetFields().Where(a => this.preselectedCtors[genericType].Any(b => b.ToString() == a.ToString())).ToArray();
+                        }
+                        if (this.preselectedCtors.ContainsKey(genericType))
+                        {
+                            ctors = type.GetConstructors().Where(a => this.preselectedCtors[genericType].Any(b => b.ToString() == a.ToString())).ToArray();
+                        }
+                        if (this.preselectedMethods.ContainsKey(genericType))
+                        {
+                            methods = type.GetMethods().Where(a => this.preselectedMethods[genericType].Any(b => b.ToString() == a.ToString())).ToArray();
+                        }
+                    }
+
+                    foreach (var gen in chain)
+                    {
+                        gen.AssemblyLoad(type.Assembly);
+
+                        if (type.IsEnum)
+                            gen.EnumLoad(type, type.GetFields(BindingFlags.Public | BindingFlags.Static));
+                        else if (type.IsClass)
+                            gen.ClassLoad(type, fields, ctors, methods);
+                        else // structs
+                            gen.ClassLoad(type, type.GetFields(BindingFlags.Public | BindingFlags.Static), ctors, methods);
+                    }
                 }
-            } 
-
-            // INFO: may be used recursively, if changed to include something (eg. some methods)
+            }
+            // INFO: iterations - are they even needed?
         }
 
 

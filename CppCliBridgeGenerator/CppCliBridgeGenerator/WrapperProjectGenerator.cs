@@ -101,6 +101,8 @@ namespace CppCliBridgeGenerator
             // add references to assemblies
             foreach (var assembly in this.loadedAssemblies)
             {
+                if (assembly.ManifestModule.Name == "mscorlib.dll") continue;
+
                 builder.AppendFormat(@"    <Reference Include=""{0}"">
       <HintPath>{1}</HintPath>
     </Reference>", assembly.FullName, assembly.ManifestModule.Name);
@@ -120,6 +122,8 @@ namespace CppCliBridgeGenerator
             // copy assemblies to output folder
             foreach (var assembly in this.loadedAssemblies)
             {
+                if (assembly.ManifestModule.Name == "mscorlib.dll") continue;
+
                 string outFile = Path.Combine(this.OutputFolder, assembly.ManifestModule.Name);
 
                 if(File.Exists(assembly.Location) && !File.Exists(outFile))

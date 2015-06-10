@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -11,7 +12,7 @@ namespace CppCliBridgeGenerator
     /// </summary>
     class XmlDocHelper
     {
-        private XmlDocument xmlDoc;
+        private readonly XmlDocument xmlDoc;
 
 
         /// <summary>
@@ -36,19 +37,24 @@ namespace CppCliBridgeGenerator
         }
 
         /// <summary>
-        /// Get documentation comment for method.
+        /// Get documentation comment for method or property.
         /// </summary>
         /// <param name="method">Method.</param>
         /// <returns>Documentation comment or empty string.</returns>
-        public string getDocDomment(MethodInfo method)
+        public string GetDocDomment(MethodInfo method)
         {
+            if (method == null || method.DeclaringType == null) return "";
+
+            // properties
             if (method.IsSpecialName)
             {
-                var property = method.DeclaringType.GetProperty(method.Name.Substring(4));
-                return getDocCommentFor("P:" + method.DeclaringType.FullName + "." + property.Name);
+                var property = method.DeclaringType.GetProperties().FirstOrDefault(p => p.GetSetMethod() == method);
+                if (property == null) return "";
+                return GetDocCommentFor("P:" + method.DeclaringType.FullName + "." + property.Name);
             }
 
-            return getDocCommentFor("M:" + method.DeclaringType.FullName + "." + method.Name + getParameters(method.GetParameters()));  
+            // methods
+            return GetDocCommentFor("M:" + method.DeclaringType.FullName + "." + method.Name + GetParameters(method.GetParameters()));  
         }
 
         /// <summary>
@@ -56,9 +62,10 @@ namespace CppCliBridgeGenerator
         /// </summary>
         /// <param name="ctor">Constructor.</param>
         /// <returns>Documentation comment or empty string.</returns>
-        public string getDocDomment(ConstructorInfo ctor)
+        public string GetDocDomment(ConstructorInfo ctor)
         {
-            return getDocCommentFor("M:" + ctor.DeclaringType.FullName + ".#ctor" + getParameters(ctor.GetParameters()));
+            if (ctor == null || ctor.DeclaringType == null) return "";
+            return GetDocCommentFor("M:" + ctor.DeclaringType.FullName + ".#ctor" + GetParameters(ctor.GetParameters()));
         }
 
         /// <summary>
@@ -66,9 +73,10 @@ namespace CppCliBridgeGenerator
         /// </summary>
         /// <param name="field">Field.</param>
         /// <returns>Documentation comment or empty string.</returns>
-        public string getDocDomment(FieldInfo field)
+        public string GetDocDomment(FieldInfo field)
         {
-            return getDocCommentFor("F:" + field.DeclaringType.FullName + field.Name);
+            if (field == null || field.DeclaringType == null) return "";
+            return GetDocCommentFor("F:" + field.DeclaringType.FullName + field.Name);
         }
 
         /// <summary>
@@ -76,21 +84,21 @@ namespace CppCliBridgeGenerator
         /// </summary>
         /// <param name="type">Type.</param>
         /// <returns>Documentation comment or empty string.</returns>
-        public string getDocDomment(Type type)
+        public string GetDocDomment(Type type)
         {
-            return getDocCommentFor("T:" + type.FullName);
+            if (type == null) return "";
+            return GetDocCommentFor("T:" + type.FullName);
         }
-
 
         /// <summary>
         /// Get documentation comment using raw node name.
         /// </summary>
         /// <param name="nodeName">Parameter name of node.</param>
         /// <returns>Documentation comment or empty string.</returns>
-        private string getDocCommentFor(string nodeName)
+        private string GetDocCommentFor(string nodeName)
         {
             if (this.xmlDoc == null) return "";
-            XmlNode node = this.xmlDoc.SelectSingleNode("//member[@name = '" + nodeName + "']");
+            var node = this.xmlDoc.SelectSingleNode("//member[@name = '" + nodeName + "']");
             if (node == null) return "";
             return Regex.Replace(node.InnerXml, Environment.NewLine + @"\s+", Environment.NewLine).Trim();
         }
@@ -100,9 +108,9 @@ namespace CppCliBridgeGenerator
         /// </summary>
         /// <param name="parameters">List of parameters.</param>
         /// <returns>Parameters as string usable in XML node name.</returns>
-        private string getParameters(ParameterInfo[] parameters)
+        private string GetParameters(ParameterInfo[] parameters)
         {
-            if (parameters.Length == 0) return "";
+            if (parameters == null || parameters.Length == 0) return "";
 
             string outstr = "(";
 

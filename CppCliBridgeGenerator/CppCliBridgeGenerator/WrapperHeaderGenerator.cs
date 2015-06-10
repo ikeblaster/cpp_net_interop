@@ -73,12 +73,14 @@ namespace CppCliBridgeGenerator
         {
             WrapperSourceGenerator.GenerateNamespaces(type, this.outClass); // generate namespaces
 
-            this.outClass.AppendLine("enum " + Utils.GetWrapperTypeNameFor(type) + " {"); // wrapper enum
+            this.outClass.AppendLine("namespace " + Utils.GetWrapperTypeNameFor(type) + " {"); // wrapper namespace
+            this.outClass.AppendLine("enum " + Utils.GetWrapperTypeNameFor(type) + "Type {"); // wrapper enum
 
             var strFields = fields.Select(f => f.Name + " = " + Convert.ChangeType(f.GetValue(null), typeof (ulong))).ToArray(); // get all enum values
             this.outClass.AppendLine("\t" + string.Join("," + Environment.NewLine + "\t", strFields)); // format them into enum
 
             this.outClass.AppendLine("};"); // enum closing
+            this.outClass.AppendLine("}"); // namespace closing
 
 
             WrapperSourceGenerator.GenerateEndNamespaces(type, this.outClass);
@@ -98,7 +100,7 @@ namespace CppCliBridgeGenerator
         /// <param name="methods">selected methods.</param>
         public override void ClassLoad(Type type, FieldInfo[] fields, ConstructorInfo[] ctors, MethodInfo[] methods)
         {
-            if (typeof(MulticastDelegate).IsAssignableFrom(type))
+            if (typeof(MulticastDelegate).IsAssignableFrom(type) || type.IsGenericTypeDefinition)
                 return;
 
             this.outHeader = new StringBuilder();
@@ -141,7 +143,7 @@ namespace CppCliBridgeGenerator
             this.outClass.AppendLine("class " + Utils.GetWrapperILBridgeTypeNameFor(type) + ";"); // IL Bridge
             this.outClass.AppendLine();
 
-            GenerateDocComment(this.xmlDoc.getDocDomment(type), this.outClass, "/// ");
+            GenerateDocComment(this.xmlDoc.GetDocDomment(type), this.outClass, "/// ");
             this.outClass.AppendLine("class _LNK " + Utils.GetWrapperTypeNameFor(type) + " {"); // Wrapper class
             this.outClass.AppendLine();
             this.outClass.AppendLine("\tpublic:");
@@ -174,11 +176,8 @@ namespace CppCliBridgeGenerator
 
             foreach (var ctor in ctors)
             {
-                if (ctor.DeclaringType == type) // skip inherited
-                {
-                    GenerateCtor(ctor, this.outClass); // generate signature for one constructor
-                    this.outClass.AppendLine();
-                }
+                GenerateCtor(ctor, this.outClass); // generate signature for one constructor
+                this.outClass.AppendLine();
             }
 
             if (type.IsValueType && ctors.Length == 0)
@@ -202,7 +201,7 @@ namespace CppCliBridgeGenerator
             var parList = new List<string>();
             GenerateParametersList(ctor.GetParameters(), ref parList);
 
-            GenerateDocComment(this.xmlDoc.getDocDomment(ctor), builder); // add documentation comment for constructor
+            GenerateDocComment(this.xmlDoc.GetDocDomment(ctor), builder); // add documentation comment for constructor
             builder.Append("\t\t");
             builder.Append(Utils.GetWrapperTypeNameFor(ctor.DeclaringType) + "("); // method name
             builder.Append(string.Join(", ", parList)); // parameters
@@ -222,11 +221,8 @@ namespace CppCliBridgeGenerator
         {
             foreach (var field in fields)
             {
-                if (field.DeclaringType == type) // skip inherited
-                {
-                    this.outClass.AppendLine();
-                    GenerateField(field, this.outClass);
-                }
+                this.outClass.AppendLine();
+                GenerateField(field, this.outClass);
             }
         }
 
@@ -246,7 +242,7 @@ namespace CppCliBridgeGenerator
 
             // GETTER
             {
-                GenerateDocComment(this.xmlDoc.getDocDomment(field), builder);
+                GenerateDocComment(this.xmlDoc.GetDocDomment(field), builder);
                 builder.Append("\t\t");
 
                 if (field.IsStatic) builder.Append("static "); // static keyword
@@ -257,7 +253,7 @@ namespace CppCliBridgeGenerator
             if (!field.IsInitOnly)
             {
                 builder.AppendLine();
-                GenerateDocComment(this.xmlDoc.getDocDomment(field), builder);
+                GenerateDocComment(this.xmlDoc.GetDocDomment(field), builder);
                 builder.Append("\t\t");
 
                 if (field.IsStatic) builder.Append("static "); // static keyword
@@ -278,11 +274,8 @@ namespace CppCliBridgeGenerator
         {
             foreach (var method in methods)
             {
-                if (method.DeclaringType == type) // skip inherited
-                {
-                    this.outClass.AppendLine();
-                    GenerateMethod(method, this.outClass);
-                }
+                this.outClass.AppendLine();
+                GenerateMethod(method, this.outClass);
             }
         }
 
@@ -304,7 +297,7 @@ namespace CppCliBridgeGenerator
             var parList = new List<string>();
             GenerateParametersList(method.GetParameters(), ref parList);
 
-            GenerateDocComment(this.xmlDoc.getDocDomment(method), builder);
+            GenerateDocComment(this.xmlDoc.GetDocDomment(method), builder);
             builder.Append("\t\t");
 
             if (method.IsStatic) builder.Append("static "); // static keyword
@@ -368,9 +361,13 @@ namespace CppCliBridgeGenerator
         private void GenerateWrapperDeclaration(Type type, StringBuilder builder)
         {
             var t = type;
-            if (t.IsArray && t.HasElementType)
+            while (t.IsArray && t.HasElementType) // array element type
             {
                 t = t.GetElementType();
+            }
+            while (TypeConverter.IsMarshalledCollection(t)) // collection element type
+            {
+                t = t.GetGenericArguments()[0];
             }
 
             if (this.declaredClasses.Contains(t)) return; // already declared class
@@ -378,7 +375,7 @@ namespace CppCliBridgeGenerator
             WrapperSourceGenerator.GenerateNamespaces(t, builder);
 
             if (t.IsEnum)
-                builder.AppendLine("enum " + Utils.GetWrapperTypeNameFor(t) + ";");
+                builder.AppendLine("namespace " + Utils.GetWrapperTypeNameFor(t) + " { enum " + Utils.GetWrapperTypeNameFor(t) + "Type; }");
             else
                 builder.AppendLine("class " + Utils.GetWrapperTypeNameFor(t) + ";");
 
