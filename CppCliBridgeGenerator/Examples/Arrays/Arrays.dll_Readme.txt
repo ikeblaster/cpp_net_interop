@@ -5,6 +5,7 @@ It contains:
  - simple enum,
  - simple struct,
  - simple class with 4 public fields,
+ - simple generic class,
  - callback function,
  - complex class, which utilizes many arrays and collection and things mentioned above.
 
