@@ -1,8 +1,6 @@
 "DotNetZip is a FAST, FREE class library and toolset for manipulating zip files." (official website)
 
-Not everything from this library can be used in bridge, please choose carefully!
-Simple methods (like ZipFile constructor, AddFile method, etc.) works perfectly.
-
+You should be able to generate and compile bridge for everything in this library.
 
 Official website of library: http://dotnetzip.codeplex.com/
 
