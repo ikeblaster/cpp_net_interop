@@ -186,7 +186,7 @@ namespace CppCliBridgeGenerator
                 }
                 else
                 {
-                    tt = TranslateType(type.GetGenericArguments()[0]); // INFO: after all, seems to be safe (collection always have at least one "argument")
+                    tt = TranslateType(type.GetGenericArguments()[0]); // INFO: after all, seems to be safe (these collections always have one "argument")
                 }
 
                 TFlags flags = TFlags.MarshalingRequired;
