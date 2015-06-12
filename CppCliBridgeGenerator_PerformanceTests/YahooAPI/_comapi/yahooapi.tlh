@@ -1,0 +1,227 @@
+﻿// Created by Microsoft (R) C/C++ Compiler Version 10.00.40219.01 (1cb29fe7).
+//
+// c:\users\uzivatel\documents\github\cpp_net_interop\cppclibridgegenerator\testdir\output3_yahooapi\_com\yahooapi.tlh
+//
+// C++ source equivalent of Win32 type library YahooAPI.tlb
+// compiler-generated file created 06/12/15 at 02:56:34 - DO NOT EDIT!
+
+//
+// Cross-referenced type libraries:
+//
+//
+
+#pragma once
+#pragma pack(push, 8)
+
+#include <comdef.h>
+
+namespace YahooAPI {
+
+//
+// Forward references and typedefs
+//
+
+struct __declspec(uuid("6c0918a2-3b41-4f57-bcd5-2d7bda50fba2"))
+/* LIBID */ __YahooAPI;
+struct /* coclass */ YahooAPI;
+struct /* coclass */ PrintCallback;
+struct __declspec(uuid("0093f292-3ce4-3645-b773-304404eaaa38"))
+/* dual interface */ _YahooAPI;
+struct __declspec(uuid("612215b1-4551-3545-b49b-81a51e225a62"))
+/* dual interface */ _PrintCallback;
+
+//
+// Smart pointer typedef declarations
+//
+
+_COM_SMARTPTR_TYPEDEF(_YahooAPI, __uuidof(_YahooAPI));
+_COM_SMARTPTR_TYPEDEF(_PrintCallback, __uuidof(_PrintCallback));
+
+//
+// Type library items
+//
+
+struct __declspec(uuid("b35baada-7508-3a64-9466-947079b4e399"))
+YahooAPI;
+    // [ default ] interface _YahooAPI
+    // interface _Object
+
+struct __declspec(uuid("f83df83f-02a9-381b-8ab0-394772fb73d6"))
+PrintCallback;
+    // [ default ] interface _PrintCallback
+    // interface _Delegate
+    // interface _Object
+    // interface ICloneable
+    // interface ISerializable
+
+struct __declspec(uuid("0093f292-3ce4-3645-b773-304404eaaa38"))
+_YahooAPI : IDispatch
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetToString))
+    _bstr_t ToString;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    _bstr_t GetToString ( );
+    VARIANT_BOOL Equals (
+        const _variant_t & obj );
+    long GetHashCode ( );
+    mscorlib::_TypePtr GetType ( );
+    double GetBid (
+        _bstr_t symbol );
+    double GetAsk (
+        _bstr_t symbol );
+    _bstr_t GetCapitalization (
+        _bstr_t symbol );
+    SAFEARRAY * GetValues (
+        _bstr_t symbol,
+        _bstr_t fields );
+    long GetStringLength (
+        _bstr_t str );
+    HRESULT test (
+        _bstr_t mode,
+        long cb );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_ToString (
+        /*[out,retval]*/ BSTR * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_Equals (
+        /*[in]*/ VARIANT obj,
+        /*[out,retval]*/ VARIANT_BOOL * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_GetHashCode (
+        /*[out,retval]*/ long * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_GetType (
+        /*[out,retval]*/ struct mscorlib::_Type * * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_GetBid (
+        /*[in]*/ BSTR symbol,
+        /*[out,retval]*/ double * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_GetAsk (
+        /*[in]*/ BSTR symbol,
+        /*[out,retval]*/ double * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_GetCapitalization (
+        /*[in]*/ BSTR symbol,
+        /*[out,retval]*/ BSTR * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_GetValues (
+        /*[in]*/ BSTR symbol,
+        /*[in]*/ BSTR fields,
+        /*[out,retval]*/ SAFEARRAY * * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_GetStringLength (
+        /*[in]*/ BSTR str,
+        /*[out,retval]*/ long * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_test (
+        /*[in]*/ BSTR mode,
+        /*[in]*/ long cb ) = 0;
+};
+
+struct __declspec(uuid("612215b1-4551-3545-b49b-81a51e225a62"))
+_PrintCallback : IDispatch
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetToString))
+    _bstr_t ToString;
+    __declspec(property(get=GetMethod))
+    mscorlib::_MethodInfoPtr Method;
+    __declspec(property(get=GetTarget))
+    _variant_t Target;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    _bstr_t GetToString ( );
+    VARIANT_BOOL Equals (
+        const _variant_t & obj );
+    long GetHashCode ( );
+    mscorlib::_TypePtr GetType ( );
+    SAFEARRAY * GetInvocationList ( );
+    _variant_t Clone ( );
+    HRESULT GetObjectData (
+        struct mscorlib::_SerializationInfo * info,
+        struct mscorlib::StreamingContext context );
+    _variant_t DynamicInvoke (
+        SAFEARRAY * args );
+    mscorlib::_MethodInfoPtr GetMethod ( );
+    _variant_t GetTarget ( );
+    HRESULT Invoke_2 (
+        _bstr_t str );
+    mscorlib::IAsyncResultPtr BeginInvoke (
+        _bstr_t str,
+        struct mscorlib::_AsyncCallback * callback,
+        const _variant_t & object );
+    HRESULT EndInvoke (
+        struct mscorlib::IAsyncResult * result );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_ToString (
+        /*[out,retval]*/ BSTR * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_Equals (
+        /*[in]*/ VARIANT obj,
+        /*[out,retval]*/ VARIANT_BOOL * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_GetHashCode (
+        /*[out,retval]*/ long * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_GetType (
+        /*[out,retval]*/ struct mscorlib::_Type * * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_GetInvocationList (
+        /*[out,retval]*/ SAFEARRAY * * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_Clone (
+        /*[out,retval]*/ VARIANT * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_GetObjectData (
+        /*[in]*/ struct mscorlib::_SerializationInfo * info,
+        /*[in]*/ struct mscorlib::StreamingContext context ) = 0;
+      virtual HRESULT __stdcall raw_DynamicInvoke (
+        /*[in]*/ SAFEARRAY * args,
+        /*[out,retval]*/ VARIANT * pRetVal ) = 0;
+      virtual HRESULT __stdcall get_Method (
+        /*[out,retval]*/ struct mscorlib::_MethodInfo * * pRetVal ) = 0;
+      virtual HRESULT __stdcall get_Target (
+        /*[out,retval]*/ VARIANT * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_Invoke_2 (
+        /*[in]*/ BSTR str ) = 0;
+      virtual HRESULT __stdcall raw_BeginInvoke (
+        /*[in]*/ BSTR str,
+        /*[in]*/ struct mscorlib::_AsyncCallback * callback,
+        /*[in]*/ VARIANT object,
+        /*[out,retval]*/ struct mscorlib::IAsyncResult * * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_EndInvoke (
+        /*[in]*/ struct mscorlib::IAsyncResult * result ) = 0;
+};
+
+//
+// Named GUID constants initializations
+//
+
+extern "C" const GUID __declspec(selectany) LIBID_YahooAPI =
+    {0x6c0918a2,0x3b41,0x4f57,{0xbc,0xd5,0x2d,0x7b,0xda,0x50,0xfb,0xa2}};
+extern "C" const GUID __declspec(selectany) CLSID_YahooAPI =
+    {0xb35baada,0x7508,0x3a64,{0x94,0x66,0x94,0x70,0x79,0xb4,0xe3,0x99}};
+extern "C" const GUID __declspec(selectany) CLSID_PrintCallback =
+    {0xf83df83f,0x02a9,0x381b,{0x8a,0xb0,0x39,0x47,0x72,0xfb,0x73,0xd6}};
+extern "C" const GUID __declspec(selectany) IID__YahooAPI =
+    {0x0093f292,0x3ce4,0x3645,{0xb7,0x73,0x30,0x44,0x04,0xea,0xaa,0x38}};
+extern "C" const GUID __declspec(selectany) IID__PrintCallback =
+    {0x612215b1,0x4551,0x3545,{0xb4,0x9b,0x81,0xa5,0x1e,0x22,0x5a,0x62}};
+
+//
+// Wrapper method implementations
+//
+
+#include "c:\users\uzivatel\documents\github\cpp_net_interop\cppclibridgegenerator\testdir\output3_yahooapi\_com\yahooapi.tli"
+
+} // namespace YahooAPI
+
+#pragma pack(pop)

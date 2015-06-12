@@ -237,5 +237,5 @@ FakesAssemblies/
 _old/
 
 CppCliBridgeGenerator/TestDir
-!CppCliBridgeGenerator_PerformanceTests/*
-!CppCliBridgeGenerator_Examples/*
+!CppCliBridgeGenerator_PerformanceTests/**
+!CppCliBridgeGenerator_Examples/**

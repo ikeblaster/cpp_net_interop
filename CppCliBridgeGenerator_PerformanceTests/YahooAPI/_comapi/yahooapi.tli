@@ -1,0 +1,176 @@
+﻿// Created by Microsoft (R) C/C++ Compiler Version 10.00.40219.01 (1cb29fe7).
+//
+// c:\users\uzivatel\documents\github\cpp_net_interop\cppclibridgegenerator\testdir\output3_yahooapi\_com\yahooapi.tli
+//
+// Wrapper implementations for Win32 type library YahooAPI.tlb
+// compiler-generated file created 06/12/15 at 02:56:34 - DO NOT EDIT!
+
+#pragma once
+
+//
+// interface _YahooAPI wrapper method implementations
+//
+
+inline _bstr_t _YahooAPI::GetToString ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_ToString(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline VARIANT_BOOL _YahooAPI::Equals ( const _variant_t & obj ) {
+    VARIANT_BOOL _result = 0;
+    HRESULT _hr = raw_Equals(obj, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline long _YahooAPI::GetHashCode ( ) {
+    long _result = 0;
+    HRESULT _hr = raw_GetHashCode(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline mscorlib::_TypePtr _YahooAPI::GetType ( ) {
+    struct mscorlib::_Type * _result = 0;
+    HRESULT _hr = raw_GetType(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return mscorlib::_TypePtr(_result, false);
+}
+
+inline double _YahooAPI::GetBid ( _bstr_t symbol ) {
+    double _result = 0;
+    HRESULT _hr = raw_GetBid(symbol, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline double _YahooAPI::GetAsk ( _bstr_t symbol ) {
+    double _result = 0;
+    HRESULT _hr = raw_GetAsk(symbol, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline _bstr_t _YahooAPI::GetCapitalization ( _bstr_t symbol ) {
+    BSTR _result = 0;
+    HRESULT _hr = raw_GetCapitalization(symbol, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline SAFEARRAY * _YahooAPI::GetValues ( _bstr_t symbol, _bstr_t fields ) {
+    SAFEARRAY * _result = 0;
+    HRESULT _hr = raw_GetValues(symbol, fields, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline long _YahooAPI::GetStringLength ( _bstr_t str ) {
+    long _result = 0;
+    HRESULT _hr = raw_GetStringLength(str, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline HRESULT _YahooAPI::test ( _bstr_t mode, long cb ) {
+    HRESULT _hr = raw_test(mode, cb);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+//
+// interface _PrintCallback wrapper method implementations
+//
+
+inline _bstr_t _PrintCallback::GetToString ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_ToString(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline VARIANT_BOOL _PrintCallback::Equals ( const _variant_t & obj ) {
+    VARIANT_BOOL _result = 0;
+    HRESULT _hr = raw_Equals(obj, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline long _PrintCallback::GetHashCode ( ) {
+    long _result = 0;
+    HRESULT _hr = raw_GetHashCode(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline mscorlib::_TypePtr _PrintCallback::GetType ( ) {
+    struct mscorlib::_Type * _result = 0;
+    HRESULT _hr = raw_GetType(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return mscorlib::_TypePtr(_result, false);
+}
+
+inline SAFEARRAY * _PrintCallback::GetInvocationList ( ) {
+    SAFEARRAY * _result = 0;
+    HRESULT _hr = raw_GetInvocationList(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline _variant_t _PrintCallback::Clone ( ) {
+    VARIANT _result;
+    VariantInit(&_result);
+    HRESULT _hr = raw_Clone(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _variant_t(_result, false);
+}
+
+inline HRESULT _PrintCallback::GetObjectData ( struct mscorlib::_SerializationInfo * info, struct mscorlib::StreamingContext context ) {
+    HRESULT _hr = raw_GetObjectData(info, context);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline _variant_t _PrintCallback::DynamicInvoke ( SAFEARRAY * args ) {
+    VARIANT _result;
+    VariantInit(&_result);
+    HRESULT _hr = raw_DynamicInvoke(args, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _variant_t(_result, false);
+}
+
+inline mscorlib::_MethodInfoPtr _PrintCallback::GetMethod ( ) {
+    struct mscorlib::_MethodInfo * _result = 0;
+    HRESULT _hr = get_Method(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return mscorlib::_MethodInfoPtr(_result, false);
+}
+
+inline _variant_t _PrintCallback::GetTarget ( ) {
+    VARIANT _result;
+    VariantInit(&_result);
+    HRESULT _hr = get_Target(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _variant_t(_result, false);
+}
+
+inline HRESULT _PrintCallback::Invoke_2 ( _bstr_t str ) {
+    HRESULT _hr = raw_Invoke_2(str);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline mscorlib::IAsyncResultPtr _PrintCallback::BeginInvoke ( _bstr_t str, struct mscorlib::_AsyncCallback * callback, const _variant_t & object ) {
+    struct mscorlib::IAsyncResult * _result = 0;
+    HRESULT _hr = raw_BeginInvoke(str, callback, object, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return mscorlib::IAsyncResultPtr(_result, false);
+}
+
+inline HRESULT _PrintCallback::EndInvoke ( struct mscorlib::IAsyncResult * result ) {
+    HRESULT _hr = raw_EndInvoke(result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
