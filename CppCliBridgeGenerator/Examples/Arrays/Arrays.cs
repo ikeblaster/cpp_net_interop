@@ -49,7 +49,7 @@ namespace MyCorp.TheProduct.SomeModule.Utilities
     }
 
     /// <summary>
-    /// Popis tridy
+    /// Class description
     /// </summary>
     public class Arrays
     {      
@@ -58,23 +58,18 @@ namespace MyCorp.TheProduct.SomeModule.Utilities
         private PrintCallback callback;
    
         /// <summary>
-        /// Popis ctoru
+        /// Ctor description
         /// </summary>
         /// <param name="name">Name</param>
         public Arrays(string name) {
             
         }  
         
-        public static Genericclass<string> GetGenericWithString() {
-            return new Genericclass<string>("Hello world");
-        }
-
-   
         /// <summary>
-        /// Popis ctoru
+        /// Ctor description
         /// </summary>
         /// <param name="name">Name</param>
-        /// <param name="password">Heslo</param>
+        /// <param name="password">Password</param>
         public Arrays(string name, string password) {
             
         }      
@@ -84,14 +79,18 @@ namespace MyCorp.TheProduct.SomeModule.Utilities
         public Arrays(bool cond, int[] ints) {
             
         }
+                
+        public static Genericclass<string> GetGenericWithString() {
+            return new Genericclass<string>("Hello world");
+        }
 
         /// <summary>
-        /// Popis property
+        /// Property description
         /// </summary>          
         public string Name { get; set; }
     
         /// <summary>
-        /// Popis metody
+        /// Method description
         /// </summary>
         public string GetStrings1()
         {
@@ -142,6 +141,10 @@ namespace MyCorp.TheProduct.SomeModule.Utilities
         public void SetInt(int i)
         {
 
+        }          
+        public int GetInt()
+        {
+            return 42;
         }       
         
         public static int[] GetInts1()
@@ -206,7 +209,7 @@ namespace MyCorp.TheProduct.SomeModule.Utilities
         }
         
         /// <summary>
-        /// Popis field
+        /// Field description
         /// </summary>  
         public Simple s;
         
@@ -226,7 +229,7 @@ namespace MyCorp.TheProduct.SomeModule.Utilities
             this.s.Position = i;
         }       
         
-        // can't work
+        // probably won't work as "intended" (struct = value type)
         public void structSetPosition(Simple s, int i) 
         {
             s.Position = i;
