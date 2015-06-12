@@ -212,7 +212,7 @@ namespace CppCliBridgeGenerator
 
                 if (field.IsStatic)
                     builder.Append(Utils.GetCppCliTypeFullNameFor(field.DeclaringType) + "::");
-                else if (field.DeclaringType != null && field.DeclaringType.IsValueType && field.DeclaringType.IsLayoutSequential)
+                else if (field.DeclaringType != null && field.DeclaringType.IsValueType && field.DeclaringType.IsLayoutSequential && false) // INFO: value structs disabled ATM! 
                     builder.Append("__IL->__Impl.");
                 else
                     builder.Append("__IL->__Impl->");
