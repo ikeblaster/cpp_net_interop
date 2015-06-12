@@ -238,3 +238,4 @@ _old/
 
 CppCliBridgeGenerator/TestDir
 !CppCliBridgeGenerator/Examples/*
+!CppCliBridgeGenerator_Examples/*
