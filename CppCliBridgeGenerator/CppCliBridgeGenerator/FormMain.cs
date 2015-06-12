@@ -38,28 +38,27 @@ namespace CppCliBridgeGenerator
             try
             {
                 assembly = Assembly.LoadFile(file); // try to load for reflection
+
+                // add root node
+                TreeNode nodeAssembly = new TreeNode() { Text = assembly.FullName, ImageKey = "Assembly.png", SelectedImageKey = "Assembly.png", Tag = assembly };
+                this.treeViewAssemblies.Nodes.Add(nodeAssembly);
+
+                nodeAssembly.Expand(); // immediately expand this root node
+
+                var types = assembly.GetTypes().Where(t => t.IsPublic).OrderBy(t => t.FullName); // get public types from assembly and order them
+
+                // add all enums and classes/structs
+                foreach (var type in types)
+                {
+                    if (type.IsEnum)
+                        AddAssembly_enum(nodeAssembly, type);
+                    else
+                        AddAssembly_class(nodeAssembly, type);
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
-                return;
-            }
-
-            // add root node
-            TreeNode nodeAssembly = new TreeNode() { Text = assembly.FullName, ImageKey = "Assembly.png", SelectedImageKey = "Assembly.png", Tag = assembly };
-            this.treeViewAssemblies.Nodes.Add(nodeAssembly);
-
-            nodeAssembly.Expand(); // immediately expand this root node
-
-            var types = assembly.GetTypes().Where(t => t.IsPublic).OrderBy(t => t.FullName); // get public types from assembly and order them
-
-            // add all enums and classes/structs
-            foreach (var type in types)
-            {
-                if (type.IsEnum)
-                    AddAssembly_enum(nodeAssembly, type);
-                else
-                    AddAssembly_class(nodeAssembly, type);
+                MessageBox.Show("An error occured during loading assembly.\nError message: " + ex.Message, "", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
