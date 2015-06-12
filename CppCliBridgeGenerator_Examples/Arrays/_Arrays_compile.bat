@@ -1,5 +1,5 @@
 @echo off
-call ..\..\..\__vcvars.bat
+call ..\__vcvars.bat
 
 set prg=Arrays
 if exist "%~dp1%prg%.dll" del "%~dp1%prg%.dll"

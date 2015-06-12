@@ -1,5 +1,5 @@
 @echo off
-call ..\..\..\__vcvars.bat
+call ..\__vcvars.bat
 
 set prg=client
 if exist "%~dp1%prg%.exe" del "%~dp1%prg%.exe"
