@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -9,6 +10,10 @@ namespace CppCliBridgeGenerator
     /// </summary>
     public static class Utils
     {
+
+        private static HashSet<string> _keywords = new HashSet<string>() { "abstract", "add", "alignas", "alignof", "and", "and_eq", "array", "as", "ascending", "asm", "async", "auto", "await", "base", "bitand", "bitor", "bool", "break", "by", "byte", "case", "catch", "char", "char16_t", "char32_t", "checked", "class", "compl", "const", "constexpr", "const_cast", "continue", "decimal", "decltype", "default", "delegate", "delete", "descending", "do", "double", "dynamic", "dynamic_cast", "else", "enum", "enum ", "equals", "explicit", "export", "extern", "false", "final", "finally", "fixed", "float", "for", "foreach", "friend", "from", "get", "global", "goto", "group", "if", "implicit", "in", "inline", "int", "interface", "internal", "into", "is", "join", "let", "lock", "long", "mutable", "namespace", "new", "noexcept", "not", "not_eq", "null", "nullptr", "object", "on", "operator", "or", "orderby", "or_eq", "out", "override", "params", "partial", "private", "protected", "public", "readonly", "ref", "register", "reinterpret_cast", "remove", "restrict", "return", "return ", "sbyte", "sealed", "select", "set", "short", "signed", "sizeof", "stackalloc", "static", "static_assert", "static_cast", "string", "struct", "switch", "template", "this", "thread_local", "throw", "true", "try", "typedef", "typeid", "typename", "typeof", "uint", "ulong", "unchecked", "union", "unsafe", "unsigned", "ushort", "using", "value", "var", "virtual", "void", "volatile", "wchar_t", "where", "while", "xor", "xor_eq", "yield", "_Bool", "_Complex", "_Imaginary" }; 
+
+
         /// <summary>
         /// Get raw full name for type usable in C++/CLI.
         /// </summary>
@@ -94,6 +99,28 @@ namespace CppCliBridgeGenerator
         public static string GetLocalTempNameFor(String name)
         {
             return "__Param_" + name;
+        }
+
+
+        /// <summary>
+        /// Get name for parameter - parameter.
+        /// </summary>
+        /// <param name="parameter">Parameter</param>
+        /// <returns>Parameter name</returns>
+        public static string GetParNameFor(ParameterInfo parameter)
+        {
+            return GetParNameFor(parameter.Name);
+        }
+
+        /// <summary>
+        /// Get name for parameter.
+        /// </summary>
+        /// <param name="name">Original variable name</param>
+        /// <returns>Parameter name</returns>
+        public static string GetParNameFor(String name)
+        {
+            if (_keywords.Contains(name)) return name + "_";
+            return name;
         }
 
         /// <summary>
