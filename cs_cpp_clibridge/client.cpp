@@ -23,8 +23,8 @@ int main()
         cout << vals[i] << endl;
     }
 
-    // cout << "Ask: " << api->GetAsk("MSFT") << endl;
-    // cout << "Bid: " << api->GetBid("MSFT") << endl;
+    cout << "Ask: " << api->GetAsk("MSFT") << endl;
+    cout << "Bid: " << api->GetBid("MSFT") << endl;
 
     
     return 0;
