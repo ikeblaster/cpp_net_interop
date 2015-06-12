@@ -122,10 +122,10 @@ namespace CppCliBridgeGenerator
         /// <returns>Formatted name</returns>
         public static string GetWrapperTypeNameFor(Type type)
         {
-            string name = type.Name.Replace("+", "_").Split('`')[0];
+            string name = type.Name.Replace('+', '_').Replace('[','_').Replace(']','_').Split('`')[0];
 
             if(type.IsGenericType)
-                name += "_" + string.Join("_", type.GetGenericArguments().Select(arg => GetCppCliTypeFullNameFor(arg).Replace("::", "_")));
+                name += "_" + string.Join("_", type.GetGenericArguments().Select(arg => arg.Namespace.Replace(".", "_") + GetWrapperTypeNameFor(arg)));
 
             return name;
         }
