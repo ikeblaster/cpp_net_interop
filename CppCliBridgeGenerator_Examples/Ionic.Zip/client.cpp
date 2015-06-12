@@ -10,7 +10,7 @@ using namespace Wrapper::Ionic::Zip;
 int main()
 {
     
-    ZipFile *zip = new ZipFile(L"out.zip");
+    ZipFile *zip = new ZipFile();
 
     zip->AddFile(L"marshaller_ext.h");
  
