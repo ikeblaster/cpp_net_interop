@@ -357,6 +357,8 @@ namespace CppCliBridgeGenerator
         {
             foreach (var parameter in parameters)
             {
+                var parName = Utils.GetParNameFor(parameter);
+
                 // translate parameter
                 var parTypeTransl = TypeConverter.TranslateType(parameter.ParameterType);
                 if (parTypeTransl.IsWrapperRequired)
@@ -381,12 +383,12 @@ namespace CppCliBridgeGenerator
                     GenerateParametersList(method.GetParameters(), ref delegateParList);
 
                     // add to output
-                    parList.Add(retTypeTransl.NativeType + " (*" + parameter.Name + ")(" + string.Join(", ", delegateParList) + ")");
+                    parList.Add(retTypeTransl.NativeType + " (*" + parName + ")(" + string.Join(", ", delegateParList) + ")");
                 }
                 else // everything else
                 {
                     // add to output
-                    parList.Add(parTypeTransl.NativeType + " " + parameter.Name);
+                    parList.Add(parTypeTransl.NativeType + " " + parName);
                 }
             }
         }
@@ -402,22 +404,23 @@ namespace CppCliBridgeGenerator
         {
             var parTypeTransl = TypeConverter.TranslateType(parameterType); // type translation
             var parType = Utils.GetCppCliTypeFor(parameterType); // type
-            var parVar = Utils.GetLocalTempNameFor(parameterName); // variable name
+            var parLocalVar = Utils.GetLocalTempNameFor(parameterName); // variable name
+            var parParameter = Utils.GetParNameFor(parameterName);
 
             if (parTypeTransl.IsMarshalingRequired)
             {
                 if (parTypeTransl.IsMarshalingInContext)
-                    builder.AppendLine("\t" + parType + " " + parVar + " = __IL->__Context->_marshal_as<" + parType + ">(" + parameterName + ");");
+                    builder.AppendLine("\t" + parType + " " + parLocalVar + " = __IL->__Context->_marshal_as<" + parType + ">(" + parParameter + ");");
                 else
-                    builder.AppendLine("\t" + parType + " " + parVar + " = _marshal_as<" + parType + ">(" + parameterName + ");");
+                    builder.AppendLine("\t" + parType + " " + parLocalVar + " = _marshal_as<" + parType + ">(" + parParameter + ");");
             }
             else if (parTypeTransl.IsCastRequired)
             {
-                builder.AppendLine("\t" + parType + " " + parVar + " = static_cast<" + parType + ">(" + parameterName + ");");
+                builder.AppendLine("\t" + parType + " " + parLocalVar + " = static_cast<" + parType + ">(" + parParameter + ");");
             }
             else
             {
-                builder.AppendLine("\t" + parType + " " + parVar + " = " + parameterName + ";");
+                builder.AppendLine("\t" + parType + " " + parLocalVar + " = " + parParameter + ";");
             }
         }
 

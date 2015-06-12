@@ -319,6 +319,8 @@ namespace CppCliBridgeGenerator
         {
             foreach (var parameter in parameters)
             {
+                var parName = Utils.GetParNameFor(parameter);
+
                 // delegates
                 if (typeof(MulticastDelegate).IsAssignableFrom(parameter.ParameterType))
                 {
@@ -336,7 +338,7 @@ namespace CppCliBridgeGenerator
                     GenerateParametersList(method.GetParameters(), ref delegateParList);
 
                     // add to output
-                    parList.Add(retTypeTransl.NativeType + " (*" + parameter.Name + ")(" + string.Join(", ", delegateParList) + ")");
+                    parList.Add(retTypeTransl.NativeType + " (*" + parName + ")(" + string.Join(", ", delegateParList) + ")");
                 }                          
                 else // everything else
                 {
@@ -348,7 +350,7 @@ namespace CppCliBridgeGenerator
                     }
 
                     // add to output
-                    parList.Add(parTypeTransl.NativeType + " " + parameter.Name);
+                    parList.Add(parTypeTransl.NativeType + " " + parName);
                 }
             }
         }
