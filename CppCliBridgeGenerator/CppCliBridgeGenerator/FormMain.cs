@@ -126,10 +126,11 @@ namespace CppCliBridgeGenerator
             foreach (var method in methods)
             {
                 if (method.DeclaringType != type) continue; // INFO: skip inherited methods - could be controlled via checkbox
-                if (method.IsGenericMethod) continue; // INFO: skip generic methods   
-                if (method.IsSpecialName && method.DeclaringType.GetProperties().FirstOrDefault(p => p.GetSetMethod() == method) == null) continue; // INFO: skip event handlers (but leave property methods)
-                if (method.GetParameters().Any(p => p.IsOut || p.IsRetval)) continue; // INFO: skip out parameters ATM - can be solved? 
-                if (method.Name == "Dispose") continue; // INFO: skip dispose method - not available in C++/CLI (use delete instead, if needed)
+                if (method.IsGenericMethod) continue; // INFO: skip generic methods - not possible   
+                if (method.IsSpecialName && method.DeclaringType.GetProperties().FirstOrDefault(p => p.GetSetMethod() == method) == null) continue; // INFO: skip event handlers (but leave property methods) - not supported ATM, but easily implementable 
+                if (typeof(MulticastDelegate).IsAssignableFrom(method.ReturnType)) continue; // INFO: skip methods returning delegate - not supported ATM, but easily implementable 
+                if (method.GetParameters().Any(p => p.IsOut)) continue; // INFO: skip out parameters - can be anyhow universally solved? 
+                if (method.Name == "Dispose") continue; // skip dispose method - not available in C++/CLI (use delete instead, if needed)
 
                 img = "Method.png";
                 if (method.IsStatic) img = "MethodStatic.png";
