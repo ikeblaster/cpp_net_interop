@@ -23,32 +23,32 @@ YahooAPI::~YahooAPI() {
 	delete __IL;
 }
 
-double YahooAPI::GetAsk(std::wstring symbol) {
+double YahooAPI::GetAsk(const std::wstring& symbol) {
 	::System::String^ __Param_symbol = _marshal_as<::System::String^>(symbol);
 	::System::Double __ReturnVal = __IL->__Impl->GetAsk(__Param_symbol);
 	return __ReturnVal;
 }
 
-double YahooAPI::GetBid(std::wstring symbol) {
+double YahooAPI::GetBid(const std::wstring& symbol) {
 	::System::String^ __Param_symbol = _marshal_as<::System::String^>(symbol);
 	::System::Double __ReturnVal = __IL->__Impl->GetBid(__Param_symbol);
 	return __ReturnVal;
 }
 
-std::wstring YahooAPI::GetCapitalization(std::wstring symbol) {
+std::wstring YahooAPI::GetCapitalization(const std::wstring& symbol) {
 	::System::String^ __Param_symbol = _marshal_as<::System::String^>(symbol);
 	::System::String^ __ReturnVal = __IL->__Impl->GetCapitalization(__Param_symbol);
 	std::wstring __ReturnValMarshaled = _marshal_as<std::wstring>(__ReturnVal);
 	return __ReturnValMarshaled;
 }
 
-int YahooAPI::GetStringLength(std::wstring str) {
+int YahooAPI::GetStringLength(const std::wstring& str) {
 	::System::String^ __Param_str = _marshal_as<::System::String^>(str);
 	::System::Int32 __ReturnVal = __IL->__Impl->GetStringLength(__Param_str);
 	return __ReturnVal;
 }
 
-std::vector<std::wstring> YahooAPI::GetValues(std::wstring symbol, std::wstring fields) {
+std::vector<std::wstring> YahooAPI::GetValues(const std::wstring& symbol, const std::wstring& fields) {
 	::System::String^ __Param_symbol = _marshal_as<::System::String^>(symbol);
 	::System::String^ __Param_fields = _marshal_as<::System::String^>(fields);
 	array<::System::String^>^ __ReturnVal = __IL->__Impl->GetValues(__Param_symbol, __Param_fields);
@@ -62,7 +62,7 @@ std::wstring YahooAPI::test() {
 	return __ReturnValMarshaled;
 }
 
-void YahooAPI::test(std::wstring mode, void (*cb)(std::wstring str)) {
+void YahooAPI::test(const std::wstring& mode, void (*cb)(const std::wstring& str)) {
 	::System::String^ __Param_mode = _marshal_as<::System::String^>(mode);
 	::YahooAPI::PrintCallback^ __Param_cb = _marshal_as<::YahooAPI::PrintCallback^>(cb);
 	__IL->__Impl->test(__Param_mode, __Param_cb);

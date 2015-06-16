@@ -1,0 +1,83 @@
+ImageRuntimeVersion: v4.0.30319
+Assembly TestSuite, Version=0.0.*, Culture=Neutrální jazyk (neutrální země): 
+	hash=SHA1, flags=PublicKey
+Assembly mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
+	hash=None, flags=None
+Struct MyCorp.TheProduct.SomeModule.Utilities.TestEnum: AutoLayout, AnsiClass, Class, Public, Sealed
+  :System.Enum
+  Fields:
+    Int32 value__ : Public, SpecialName, RTSpecialName
+    MyCorp.TheProduct.SomeModule.Utilities.TestEnum None = 0 : Public, Static, Literal, HasDefault
+    MyCorp.TheProduct.SomeModule.Utilities.TestEnum DOS = 1 : Public, Static, Literal, HasDefault
+    MyCorp.TheProduct.SomeModule.Utilities.TestEnum Windows = 2 : Public, Static, Literal, HasDefault
+    MyCorp.TheProduct.SomeModule.Utilities.TestEnum Unix = 4 : Public, Static, Literal, HasDefault
+    MyCorp.TheProduct.SomeModule.Utilities.TestEnum InfoZip1 = 8 : Public, Static, Literal, HasDefault
+Struct MyCorp.TheProduct.SomeModule.Utilities.Simple: AutoLayout, AnsiClass, Class, Public, SequentialLayout, Sealed, BeforeFieldInit
+  :System.ValueType
+  Fields:
+    Int32 Position : Public
+    Boolean Exists : Public
+    Double LastValue : Public
+Class MyCorp.TheProduct.SomeModule.Utilities.Stuff: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+    Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Fields:
+    System.String Name : Public
+    Int32[] IntsField : Public
+    MyCorp.TheProduct.SomeModule.Utilities.TestEnum lineending : Public
+  Properties:
+    Int32[] IntsProperty 'get set' : 
+  Methods:
+    get_IntsProperty(): PrivateScope, Public, HideBySig, SpecialName
+    set_IntsProperty(Int32[]): PrivateScope, Public, HideBySig, SpecialName
+Class MyCorp.TheProduct.SomeModule.Utilities.Genericclass`1[T]: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+  Type parameter: T
+    Void .ctor(T): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Methods:
+    print(): PrivateScope, Public, HideBySig
+    print2(): PrivateScope, Public, HideBySig
+Class MyCorp.TheProduct.SomeModule.Utilities.Arrays: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+    Void .ctor(System.String): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+    Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+    Void .ctor(System.String, System.String): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+    Void .ctor(System.String[], Int32): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+    Void .ctor(Boolean, Int32[]): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Fields:
+    MyCorp.TheProduct.SomeModule.Utilities.Simple s : Public
+  Properties:
+    System.String Name 'get set' : 
+  Methods:
+    GetGenericWithString(): PrivateScope, Public, HideBySig
+    get_Name(): PrivateScope, Public, HideBySig, SpecialName
+    set_Name(String): PrivateScope, Public, HideBySig, SpecialName
+    GetStrings1(): PrivateScope, Public, HideBySig
+    GetStrings2(): PrivateScope, Public, HideBySig
+    test(String[,]): PrivateScope, Public, HideBySig
+    GetStrings3(): PrivateScope, Public, HideBySig
+    GetStrings4(): PrivateScope, Public, HideBySig
+    SetInt(Int32): PrivateScope, Public, HideBySig
+    GetInt(): PrivateScope, Public, HideBySig
+    GetInts1(): PrivateScope, Public, HideBySig
+    GetInts2(): PrivateScope, Public, HideBySig
+    GetObject(): PrivateScope, Public, HideBySig
+    GetObjects(): PrivateScope, Public, HideBySig
+    SetObject(Stuff): PrivateScope, Public, HideBySig
+    SetObjects(Stuff[]): PrivateScope, Public, HideBySig
+    callbackSet(String, PrintCallback): PrivateScope, Public, HideBySig
+    callbackInvoke(): PrivateScope, Public, HideBySig
+    structSet(Simple): PrivateScope, Public, HideBySig
+    structGet(): PrivateScope, Public, HideBySig
+    structSetPosition(Int32): PrivateScope, Public, HideBySig
+    structSetPosition(Simple, Int32): PrivateScope, Public, HideBySig
+    structGetPosition(): PrivateScope, Public, HideBySig
+    structGetPosition(Simple): PrivateScope, Public, HideBySig
+    listGetInts(): PrivateScope, Public, HideBySig
+    listGetString(): PrivateScope, Public, HideBySig
+    listSetInts(List`1): PrivateScope, Public, HideBySig
+    listSetStrings(List`1): PrivateScope, Public, HideBySig
+Class MyCorp.TheProduct.SomeModule.Utilities.Arrays+PrintCallback: AutoLayout, AnsiClass, Class, NestedPublic, Sealed
+  :System.MulticastDelegate
+    Void .ctor(System.Object, IntPtr): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Methods:
+    Invoke(String, Int32): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask
+    BeginInvoke(String, Int32, AsyncCallback, Object): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask
+    EndInvoke(IAsyncResult): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask

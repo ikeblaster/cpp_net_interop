@@ -1,0 +1,24 @@
+ImageRuntimeVersion: v4.0.30319
+Assembly YahooAPI, Version=1.0.*, Culture=Neutrální jazyk (neutrální země): 
+	hash=SHA1, flags=PublicKey
+Assembly mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
+	hash=None, flags=None
+Assembly System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
+	hash=None, flags=None
+Class YahooAPI: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+    Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Methods:
+    GetBid(String): PrivateScope, Public, HideBySig
+    GetAsk(String): PrivateScope, Public, HideBySig
+    GetCapitalization(String): PrivateScope, Public, HideBySig
+    GetValues(String, String): PrivateScope, Public, HideBySig
+    GetStringLength(String): PrivateScope, Public, HideBySig
+    test(): PrivateScope, Public, HideBySig
+    test(String, PrintCallback(HasFieldMarshal)): PrivateScope, Public, HideBySig
+Class YahooAPI+PrintCallback: AutoLayout, AnsiClass, Class, NestedPublic, Sealed
+  :System.MulticastDelegate
+    Void .ctor(System.Object, IntPtr): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Methods:
+    Invoke(String): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask
+    BeginInvoke(String, AsyncCallback, Object): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask
+    EndInvoke(IAsyncResult): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask

@@ -21,19 +21,19 @@ class _LNK YahooAPI {
 
 		~YahooAPI();
 
-		double GetAsk(std::wstring symbol);
+		double GetAsk(const std::wstring& symbol);
 
-		double GetBid(std::wstring symbol);
+		double GetBid(const std::wstring& symbol);
 
-		std::wstring GetCapitalization(std::wstring symbol);
+		std::wstring GetCapitalization(const std::wstring& symbol);
 
-		int GetStringLength(std::wstring str);
+		int GetStringLength(const std::wstring& str);
 
-		std::vector<std::wstring> GetValues(std::wstring symbol, std::wstring fields);
+		std::vector<std::wstring> GetValues(const std::wstring& symbol, const std::wstring& fields);
 
 		std::wstring test();
 
-		void test(std::wstring mode, void (*cb)(std::wstring str));
+		void test(const std::wstring& mode, void (*cb)(const std::wstring& str));
 };
 
 }

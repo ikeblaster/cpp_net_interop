@@ -1,0 +1,405 @@
+﻿// Created by Microsoft (R) C/C++ Compiler Version 10.00.40219.01 (a71e9a4a).
+//
+// c:\users\uzivatel\documents\github\cpp_net_interop\cppclibridgegenerator_performancetests\testsuite\_comapi\testsuite.tlh
+//
+// C++ source equivalent of Win32 type library TestSuite.tlb
+// compiler-generated file created 06/16/15 at 18:53:48 - DO NOT EDIT!
+
+//
+// Cross-referenced type libraries:
+//
+//
+
+#pragma once
+#pragma pack(push, 8)
+
+#include <comdef.h>
+
+namespace TestSuite {
+
+//
+// Forward references and typedefs
+//
+
+struct __declspec(uuid("6c0918a2-3b41-4f57-bcd5-2d7bda50fba3"))
+/* LIBID */ __TestSuite;
+enum TestEnum;
+struct Simple;
+struct /* coclass */ Stuff;
+struct /* coclass */ Arrays;
+struct /* coclass */ PrintCallback;
+struct __declspec(uuid("a43470a9-ea44-3f21-8f11-e399c3a38d9e"))
+/* dual interface */ _Stuff;
+struct __declspec(uuid("76c99bf7-13d9-3e29-be5c-33e78d9a961f"))
+/* dual interface */ _Arrays;
+struct __declspec(uuid("a447abf0-f8a7-3420-9738-3d5c752bf8d8"))
+/* dual interface */ _PrintCallback;
+
+//
+// Smart pointer typedef declarations
+//
+
+_COM_SMARTPTR_TYPEDEF(_Stuff, __uuidof(_Stuff));
+_COM_SMARTPTR_TYPEDEF(_PrintCallback, __uuidof(_PrintCallback));
+_COM_SMARTPTR_TYPEDEF(_Arrays, __uuidof(_Arrays));
+
+//
+// Type library items
+//
+
+enum __declspec(uuid("6ef98b90-6338-3751-8231-4a235d500c7e"))
+TestEnum
+{
+    TestEnum_None = 0,
+    TestEnum_DOS = 1,
+    TestEnum_Windows = 2,
+    TestEnum_Unix = 4,
+    TestEnum_InfoZip1 = 8
+};
+
+#pragma pack(push, 8)
+
+struct __declspec(uuid("e9835b92-ecac-3497-bbc4-547f6bc67b62"))
+Simple
+{
+    long Position;
+    long Exists;
+    double LastValue;
+};
+
+#pragma pack(pop)
+
+struct __declspec(uuid("39717a50-517a-3fbe-bbea-c2dddd720b58"))
+Stuff;
+    // [ default ] interface _Stuff
+    // interface _Object
+
+struct __declspec(uuid("2ed2f2b2-227a-3fc8-827b-6c466191944a"))
+Arrays;
+    // [ default ] interface _Arrays
+    // interface _Object
+
+struct __declspec(uuid("01b6680b-bcd8-3ace-a1f2-109faa4fadf6"))
+PrintCallback;
+    // [ default ] interface _PrintCallback
+    // interface _Delegate
+    // interface _Object
+    // interface ICloneable
+    // interface ISerializable
+
+struct __declspec(uuid("a43470a9-ea44-3f21-8f11-e399c3a38d9e"))
+_Stuff : IDispatch
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetToString))
+    _bstr_t ToString;
+    __declspec(property(get=GetIntsProperty,put=PutIntsProperty))
+    SAFEARRAY * IntsProperty;
+    __declspec(property(get=GetName,put=PutName))
+    _bstr_t Name;
+    __declspec(property(get=GetIntsField,put=PutIntsField))
+    SAFEARRAY * IntsField;
+    __declspec(property(get=Getlineending,put=Putlineending))
+    enum TestEnum lineending;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    _bstr_t GetToString ( );
+    VARIANT_BOOL Equals (
+        const _variant_t & obj );
+    long GetHashCode ( );
+    mscorlib::_TypePtr GetType ( );
+    SAFEARRAY * GetIntsProperty ( );
+    void PutIntsProperty (
+        SAFEARRAY * pRetVal );
+    _bstr_t GetName ( );
+    void PutName (
+        _bstr_t pRetVal );
+    SAFEARRAY * GetIntsField ( );
+    void PutIntsField (
+        SAFEARRAY * pRetVal );
+    enum TestEnum Getlineending ( );
+    void Putlineending (
+        enum TestEnum pRetVal );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_ToString (
+        /*[out,retval]*/ BSTR * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_Equals (
+        /*[in]*/ VARIANT obj,
+        /*[out,retval]*/ VARIANT_BOOL * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_GetHashCode (
+        /*[out,retval]*/ long * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_GetType (
+        /*[out,retval]*/ struct mscorlib::_Type * * pRetVal ) = 0;
+      virtual HRESULT __stdcall get_IntsProperty (
+        /*[out,retval]*/ SAFEARRAY * * pRetVal ) = 0;
+      virtual HRESULT __stdcall put_IntsProperty (
+        /*[in]*/ SAFEARRAY * pRetVal ) = 0;
+      virtual HRESULT __stdcall get_Name (
+        /*[out,retval]*/ BSTR * pRetVal ) = 0;
+      virtual HRESULT __stdcall put_Name (
+        /*[in]*/ BSTR pRetVal ) = 0;
+      virtual HRESULT __stdcall get_IntsField (
+        /*[out,retval]*/ SAFEARRAY * * pRetVal ) = 0;
+      virtual HRESULT __stdcall put_IntsField (
+        /*[in]*/ SAFEARRAY * pRetVal ) = 0;
+      virtual HRESULT __stdcall get_lineending (
+        /*[out,retval]*/ enum TestEnum * pRetVal ) = 0;
+      virtual HRESULT __stdcall put_lineending (
+        /*[in]*/ enum TestEnum pRetVal ) = 0;
+};
+
+struct __declspec(uuid("a447abf0-f8a7-3420-9738-3d5c752bf8d8"))
+_PrintCallback : IDispatch
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetToString))
+    _bstr_t ToString;
+    __declspec(property(get=GetMethod))
+    mscorlib::_MethodInfoPtr Method;
+    __declspec(property(get=GetTarget))
+    _variant_t Target;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    _bstr_t GetToString ( );
+    VARIANT_BOOL Equals (
+        const _variant_t & obj );
+    long GetHashCode ( );
+    mscorlib::_TypePtr GetType ( );
+    SAFEARRAY * GetInvocationList ( );
+    _variant_t Clone ( );
+    HRESULT GetObjectData (
+        struct mscorlib::_SerializationInfo * info,
+        struct mscorlib::StreamingContext context );
+    _variant_t DynamicInvoke (
+        SAFEARRAY * args );
+    mscorlib::_MethodInfoPtr GetMethod ( );
+    _variant_t GetTarget ( );
+    _bstr_t Invoke_2 (
+        _bstr_t str,
+        long i );
+    mscorlib::IAsyncResultPtr BeginInvoke (
+        _bstr_t str,
+        long i,
+        struct mscorlib::_AsyncCallback * callback,
+        const _variant_t & object );
+    _bstr_t EndInvoke (
+        struct mscorlib::IAsyncResult * result );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_ToString (
+        /*[out,retval]*/ BSTR * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_Equals (
+        /*[in]*/ VARIANT obj,
+        /*[out,retval]*/ VARIANT_BOOL * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_GetHashCode (
+        /*[out,retval]*/ long * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_GetType (
+        /*[out,retval]*/ struct mscorlib::_Type * * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_GetInvocationList (
+        /*[out,retval]*/ SAFEARRAY * * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_Clone (
+        /*[out,retval]*/ VARIANT * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_GetObjectData (
+        /*[in]*/ struct mscorlib::_SerializationInfo * info,
+        /*[in]*/ struct mscorlib::StreamingContext context ) = 0;
+      virtual HRESULT __stdcall raw_DynamicInvoke (
+        /*[in]*/ SAFEARRAY * args,
+        /*[out,retval]*/ VARIANT * pRetVal ) = 0;
+      virtual HRESULT __stdcall get_Method (
+        /*[out,retval]*/ struct mscorlib::_MethodInfo * * pRetVal ) = 0;
+      virtual HRESULT __stdcall get_Target (
+        /*[out,retval]*/ VARIANT * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_Invoke_2 (
+        /*[in]*/ BSTR str,
+        /*[in]*/ long i,
+        /*[out,retval]*/ BSTR * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_BeginInvoke (
+        /*[in]*/ BSTR str,
+        /*[in]*/ long i,
+        /*[in]*/ struct mscorlib::_AsyncCallback * callback,
+        /*[in]*/ VARIANT object,
+        /*[out,retval]*/ struct mscorlib::IAsyncResult * * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_EndInvoke (
+        /*[in]*/ struct mscorlib::IAsyncResult * result,
+        /*[out,retval]*/ BSTR * pRetVal ) = 0;
+};
+
+struct __declspec(uuid("76c99bf7-13d9-3e29-be5c-33e78d9a961f"))
+_Arrays : IDispatch
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetToString))
+    _bstr_t ToString;
+    __declspec(property(get=Gets,put=Puts))
+    struct Simple s;
+    __declspec(property(get=GetName,put=PutName))
+    _bstr_t Name;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    _bstr_t GetToString ( );
+    VARIANT_BOOL Equals (
+        const _variant_t & obj );
+    long GetHashCode ( );
+    mscorlib::_TypePtr GetType ( );
+    _bstr_t GetName ( );
+    void PutName (
+        _bstr_t pRetVal );
+    _bstr_t GetStrings1 ( );
+    SAFEARRAY * GetStrings2 ( );
+    HRESULT test (
+        SAFEARRAY * strs );
+    SAFEARRAY * GetStrings3 ( );
+    HRESULT SetInt (
+        long i );
+    long GetInt ( );
+    SAFEARRAY * GetInts1 ( );
+    _StuffPtr GetObject ( );
+    SAFEARRAY * GetObjects ( );
+    _StuffPtr SetObject (
+        struct _Stuff * s );
+    _StuffPtr SetObjects (
+        SAFEARRAY * s );
+    HRESULT callbackSet (
+        _bstr_t mode,
+        struct _PrintCallback * cb );
+    HRESULT callbackInvoke ( );
+    HRESULT structSet (
+        struct Simple s );
+    struct Simple structGet ( );
+    HRESULT structSetPosition (
+        long i );
+    HRESULT structSetPosition_2 (
+        struct Simple s,
+        long i );
+    long structGetPosition ( );
+    long structGetPosition_2 (
+        struct Simple s );
+    struct Simple Gets ( );
+    void Puts (
+        struct Simple pRetVal );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_ToString (
+        /*[out,retval]*/ BSTR * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_Equals (
+        /*[in]*/ VARIANT obj,
+        /*[out,retval]*/ VARIANT_BOOL * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_GetHashCode (
+        /*[out,retval]*/ long * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_GetType (
+        /*[out,retval]*/ struct mscorlib::_Type * * pRetVal ) = 0;
+    virtual HRESULT _VtblGapPlaceholder1( ) { return E_NOTIMPL; }
+      virtual HRESULT __stdcall get_Name (
+        /*[out,retval]*/ BSTR * pRetVal ) = 0;
+      virtual HRESULT __stdcall put_Name (
+        /*[in]*/ BSTR pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_GetStrings1 (
+        /*[out,retval]*/ BSTR * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_GetStrings2 (
+        /*[out,retval]*/ SAFEARRAY * * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_test (
+        /*[in]*/ SAFEARRAY * strs ) = 0;
+      virtual HRESULT __stdcall raw_GetStrings3 (
+        /*[out,retval]*/ SAFEARRAY * * pRetVal ) = 0;
+    virtual HRESULT _VtblGapPlaceholder2( ) { return E_NOTIMPL; }
+      virtual HRESULT __stdcall raw_SetInt (
+        /*[in]*/ long i ) = 0;
+      virtual HRESULT __stdcall raw_GetInt (
+        /*[out,retval]*/ long * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_GetInts1 (
+        /*[out,retval]*/ SAFEARRAY * * pRetVal ) = 0;
+    virtual HRESULT _VtblGapPlaceholder3( ) { return E_NOTIMPL; }
+      virtual HRESULT __stdcall raw_GetObject (
+        /*[out,retval]*/ struct _Stuff * * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_GetObjects (
+        /*[out,retval]*/ SAFEARRAY * * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_SetObject (
+        /*[in]*/ struct _Stuff * s,
+        /*[out,retval]*/ struct _Stuff * * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_SetObjects (
+        /*[in]*/ SAFEARRAY * s,
+        /*[out,retval]*/ struct _Stuff * * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_callbackSet (
+        /*[in]*/ BSTR mode,
+        /*[in]*/ struct _PrintCallback * cb ) = 0;
+      virtual HRESULT __stdcall raw_callbackInvoke ( ) = 0;
+      virtual HRESULT __stdcall raw_structSet (
+        /*[in]*/ struct Simple s ) = 0;
+      virtual HRESULT __stdcall raw_structGet (
+        /*[out,retval]*/ struct Simple * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_structSetPosition (
+        /*[in]*/ long i ) = 0;
+      virtual HRESULT __stdcall raw_structSetPosition_2 (
+        /*[in]*/ struct Simple s,
+        /*[in]*/ long i ) = 0;
+      virtual HRESULT __stdcall raw_structGetPosition (
+        /*[out,retval]*/ long * pRetVal ) = 0;
+      virtual HRESULT __stdcall raw_structGetPosition_2 (
+        /*[in]*/ struct Simple s,
+        /*[out,retval]*/ long * pRetVal ) = 0;
+    virtual HRESULT _VtblGapPlaceholder4( ) { return E_NOTIMPL; }
+    virtual HRESULT _VtblGapPlaceholder5( ) { return E_NOTIMPL; }
+    virtual HRESULT _VtblGapPlaceholder6( ) { return E_NOTIMPL; }
+    virtual HRESULT _VtblGapPlaceholder7( ) { return E_NOTIMPL; }
+      virtual HRESULT __stdcall get_s (
+        /*[out,retval]*/ struct Simple * pRetVal ) = 0;
+      virtual HRESULT __stdcall put_s (
+        /*[in]*/ struct Simple pRetVal ) = 0;
+};
+
+//
+// Named GUID constants initializations
+//
+
+extern "C" const GUID __declspec(selectany) LIBID_TestSuite =
+    {0x6c0918a2,0x3b41,0x4f57,{0xbc,0xd5,0x2d,0x7b,0xda,0x50,0xfb,0xa3}};
+extern "C" const GUID __declspec(selectany) CLSID_Stuff =
+    {0x39717a50,0x517a,0x3fbe,{0xbb,0xea,0xc2,0xdd,0xdd,0x72,0x0b,0x58}};
+extern "C" const GUID __declspec(selectany) CLSID_Arrays =
+    {0x2ed2f2b2,0x227a,0x3fc8,{0x82,0x7b,0x6c,0x46,0x61,0x91,0x94,0x4a}};
+extern "C" const GUID __declspec(selectany) CLSID_PrintCallback =
+    {0x01b6680b,0xbcd8,0x3ace,{0xa1,0xf2,0x10,0x9f,0xaa,0x4f,0xad,0xf6}};
+extern "C" const GUID __declspec(selectany) IID__Stuff =
+    {0xa43470a9,0xea44,0x3f21,{0x8f,0x11,0xe3,0x99,0xc3,0xa3,0x8d,0x9e}};
+extern "C" const GUID __declspec(selectany) IID__PrintCallback =
+    {0xa447abf0,0xf8a7,0x3420,{0x97,0x38,0x3d,0x5c,0x75,0x2b,0xf8,0xd8}};
+extern "C" const GUID __declspec(selectany) IID__Arrays =
+    {0x76c99bf7,0x13d9,0x3e29,{0xbe,0x5c,0x33,0xe7,0x8d,0x9a,0x96,0x1f}};
+
+//
+// Wrapper method implementations
+//
+
+#include "c:\users\uzivatel\documents\github\cpp_net_interop\cppclibridgegenerator_performancetests\testsuite\_comapi\testsuite.tli"
+
+} // namespace TestSuite
+
+#pragma pack(pop)

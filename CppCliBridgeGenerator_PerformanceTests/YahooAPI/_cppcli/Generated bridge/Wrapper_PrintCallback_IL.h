@@ -9,9 +9,9 @@ namespace Wrapper {
 ref class PrintCallback_IL {
 	public:
 
-		void (*cb)(std::wstring str);
+		void (*cb)(const std::wstring& str);
 
-		PrintCallback_IL(void (*cb)(std::wstring str)) {
+		PrintCallback_IL(void (*cb)(const std::wstring& str)) {
 			this->cb = cb;
 		}
 
@@ -25,9 +25,9 @@ ref class PrintCallback_IL {
 }
 
 template <>
-struct _marshal_helper<::YahooAPI::PrintCallback^, void (*)(std::wstring str)>
+struct _marshal_helper<::YahooAPI::PrintCallback^, void (*)(const std::wstring& str)>
 {
-	inline static ::YahooAPI::PrintCallback^ marshal(void (*from)(std::wstring str))
+	inline static ::YahooAPI::PrintCallback^ marshal(void (*from)(const std::wstring& str))
 	{
 		Wrapper::PrintCallback_IL^ bridge = gcnew Wrapper::PrintCallback_IL(from);
 		return gcnew ::YahooAPI::PrintCallback(bridge, &Wrapper::PrintCallback_IL::Invoke);

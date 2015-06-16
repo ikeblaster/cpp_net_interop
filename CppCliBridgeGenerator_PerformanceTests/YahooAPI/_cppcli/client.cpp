@@ -1,11 +1,11 @@
 #pragma comment(lib, "Wrapper")
 #include <iostream>
-#include "Wrapper_YahooAPI.h"
+#include "Generated bridge\Wrapper_YahooAPI.h"
  
 using namespace std;
 using namespace Wrapper;
  
-void PrintCB(wstring str) {
+void PrintCB(const wstring& str) {
     
 }
  
