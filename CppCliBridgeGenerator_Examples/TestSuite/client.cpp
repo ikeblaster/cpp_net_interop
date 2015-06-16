@@ -10,19 +10,20 @@
 using namespace std;
 using namespace Wrapper::MyCorp::TheProduct::SomeModule::Utilities;
  
-wstring PrintCB(wstring q, int a) {
+wstring PrintCB(const wstring& q, int a) {
     wcout << L"° C++ callback: \"" << q << L"\" is \"" << a << L"\"." << endl;
     return L"Name changed in C++ callback";
 }
 
 int main()
 {
+      
     Arrays* api = new Arrays(L"");
     
     Stuff* ss = new Stuff();
-    ss->set_Name(L"jmeno");
+    ss->SetName(L"that's me");
     
-    wcout << ss->get_Name() << endl;
+    wcout << ss->GetName() << endl;
     
     
     
@@ -35,9 +36,9 @@ int main()
     }
 
     vals.clear();
-    vals.push_back(L"tisk 1");
-    vals.push_back(L"tisk 2");
-    vals.push_back(L"tisk 3");
+    vals.push_back(L"print 1");
+    vals.push_back(L"print 2");
+    vals.push_back(L"print 3");
     Arrays::listSetStrings(vals);
 
 
@@ -46,17 +47,17 @@ int main()
     wcout << endl << L"Struct" << endl << "=========" << endl;
     
     Simple* s = new Simple();
-    s->set_Position(12345);
+    s->SetPosition(12345);
     
     api->structSet(s);
     
-    s->set_LastValue(321.512345674896);
+    s->SetLastValue(321.512345674896);
     api->structSetPosition(3215);
 
-    api->set_s(s);
+    api->SetS(s);
     
-    wcout << s->get_LastValue() << endl;
-    wcout << s->get_Position() << endl;
+    wcout << s->GetLastValue() << endl;
+    wcout << s->GetPosition() << endl;
 
 
     
@@ -73,34 +74,35 @@ int main()
     api->callbackSet(L"", &PrintCB);
     
     
-    wcout << stuff->get_Name() << endl;
+    wcout << stuff->GetName() << endl;
     
     api->SetObjects(stuffs);
 
-    wcout << stuff->get_Name() << endl;
+    wcout << stuff->GetName() << endl;
     
     api->SetObject(stuff);
     
-    wcout << stuff->get_Name() << endl;
+    wcout << stuff->GetName() << endl;
     
     api->callbackInvoke();
     
-    wcout << stuff->get_Name() << endl;
+    wcout << stuff->GetName() << endl;
     
     
     
     stuff2 = api->SetObject(stuff);
-    stuff->set_Name(L"ike");
-    wcout << stuff2->get_Name() << endl;
+    stuff->SetName(L"ike");
+    wcout << stuff2->GetName() << endl;
     
     api->SetObject(stuff2);
     
-    stuff->set_lineending(TestEnum::InfoZip1);
+    stuff->SetLineending(TestEnum::InfoZip1);
     
-    TestEnum le = stuff2->get_lineending();
+    TestEnum::TestEnumType le = stuff2->GetLineending();
     
     wcout << le << endl;
-    wcout << stuff2->get_Name() << endl; 
+    wcout << stuff2->GetName() << endl; 
+    
     
     
     
@@ -111,6 +113,7 @@ int main()
     gcls->print();
     gcls->print2();
 
+    
     
     return 0;
 }

@@ -1,7 +1,7 @@
 @echo off
 call ..\__vcvars.bat
 
-set prg=Arrays
+set prg=TestSuite
 if exist "%~dp1%prg%.dll" del "%~dp1%prg%.dll"
 
 csc /doc:%prg%.xml /target:library %prg%.cs

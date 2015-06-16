@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
     <assembly>
-        <name>Arrays</name>
+        <name>TestSuite</name>
     </assembly>
     <members>
         <member name="T:MyCorp.TheProduct.SomeModule.Utilities.Arrays">
@@ -21,6 +21,16 @@
             </summary>
             <param name="name">Name</param>
             <param name="password">Password</param>
+        </member>
+        <member name="M:MyCorp.TheProduct.SomeModule.Utilities.Arrays.Dispose">
+            <summary>
+            Public implementation of Dispose pattern callable by consumers.
+            </summary>
+        </member>
+        <member name="M:MyCorp.TheProduct.SomeModule.Utilities.Arrays.Dispose(System.Boolean)">
+            <summary>
+            Protected implementation of Dispose pattern.
+            </summary>
         </member>
         <member name="M:MyCorp.TheProduct.SomeModule.Utilities.Arrays.GetStrings1">
             <summary>

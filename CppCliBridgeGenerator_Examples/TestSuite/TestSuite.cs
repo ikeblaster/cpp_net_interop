@@ -51,8 +51,11 @@ namespace MyCorp.TheProduct.SomeModule.Utilities
     /// <summary>
     /// Class description
     /// </summary>
-    public class Arrays
+    public class Arrays : IDisposable
     {      
+    
+
+    
         public delegate string PrintCallback(string str, int i);
         
         private PrintCallback callback;
@@ -83,6 +86,23 @@ namespace MyCorp.TheProduct.SomeModule.Utilities
         public static Genericclass<string> GetGenericWithString() {
             return new Genericclass<string>("Hello world");
         }
+        
+        /// <summary>
+        /// Public implementation of Dispose pattern callable by consumers.
+        /// </summary>
+        public void Dispose()
+        { 
+            System.Console.WriteLine("public void Dispose()");          
+        }
+        
+        /// <summary>
+        /// Protected implementation of Dispose pattern.
+        /// </summary>
+        protected virtual void Dispose(bool disposing)
+        {
+            System.Console.WriteLine("protected virtual void Dispose(bool disposing) " + disposing);
+        }
+        
 
         /// <summary>
         /// Property description
@@ -253,7 +273,7 @@ namespace MyCorp.TheProduct.SomeModule.Utilities
         
         public static List<string> listGetString() 
         {
-            return new List<string>() { "dva", "tri", "5", "7", "11", "13", "17" };
+            return new List<string>() { "two", "three", "5", "7", "11", "13", "17" };
         } 
         
         public static void listSetInts(List<int> list) 
