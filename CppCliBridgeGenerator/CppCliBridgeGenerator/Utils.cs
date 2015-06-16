@@ -152,7 +152,7 @@ namespace CppCliBridgeGenerator
             string name = type.Name.Replace('+', '_').Replace('[','_').Replace(']','_').Split('`')[0];
 
             if(type.IsGenericType)
-                name += "_" + string.Join("_", type.GetGenericArguments().Select(arg => arg.Namespace.Replace(".", "_") + GetWrapperTypeNameFor(arg)));
+                name += "__" + string.Join("_", type.GetGenericArguments().Select(arg => arg.Namespace.Replace(".", "_") + "_" + GetWrapperTypeNameFor(arg)));
 
             return name;
         }
@@ -219,6 +219,20 @@ namespace CppCliBridgeGenerator
         {
             if (text.Length == 0) return text;
             return spacer + text.Replace(Environment.NewLine, Environment.NewLine + spacer);
+        }
+
+        /// <summary>
+        /// Change first letter of text to uppercase variant.
+        /// </summary>
+        /// <param name="text">Text</param>
+        /// <returns>Text with first letter in uppercase</returns>
+        public static string UppercaseFirstLetter(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return string.Empty;
+            char[] a = text.ToCharArray();
+            a[0] = char.ToUpper(a[0]);
+            return new string(a);
         }
     }
 }
