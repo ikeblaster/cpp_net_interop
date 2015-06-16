@@ -533,6 +533,54 @@ namespace CppCliBridgeGenerator
             builder.AppendLine("}"); // wrapper namespace
         }
 
+        /// <summary>
+        /// Get method suffix for fields (ie. without Get/Set).
+        /// </summary>
+        /// <param name="field">Field.</param>
+        /// <returns>Method suffix.</returns>
+        public static string GetFieldMethodSuffix(FieldInfo field)
+        {
+            string methodNameSuffix = Utils.UppercaseFirstLetter(field.Name);
+
+            if (field.ReflectedType != null)
+            {
+                while (field.ReflectedType.GetMethods().Any(m => m.Name == "Get" + methodNameSuffix || m.Name == "Set" + methodNameSuffix))
+                {
+                    methodNameSuffix += "_";
+                }
+            }
+
+            return methodNameSuffix;
+        }
+
+        /// <summary>
+        /// Get better method name for property.
+        /// </summary>
+        /// <param name="method">Method.</param>
+        /// <returns>New method name.</returns>
+        public static string GetPropertyMethodName(MethodInfo method)
+        {
+            var methodName = method.Name;
+
+            if (method.ReflectedType != null)
+            {
+                var property = method.ReflectedType.GetProperties().FirstOrDefault(p => p.GetSetMethod() == method || p.GetGetMethod() == method);
+                if (property != null)
+                {
+                    if (property.GetSetMethod() == method) methodName = "Set" + Utils.UppercaseFirstLetter(property.Name);
+                    else methodName = "Get" + Utils.UppercaseFirstLetter(property.Name);
+
+                    while (method.ReflectedType.GetMethods().Any(m => m.Name == methodName))
+                    {
+                        methodName += "_";
+                    }
+                }
+
+            }
+
+            return methodName;
+        }
+
 
         #endregion
 
