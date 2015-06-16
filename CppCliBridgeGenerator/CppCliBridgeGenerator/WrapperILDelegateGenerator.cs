@@ -165,7 +165,7 @@ namespace CppCliBridgeGenerator
             // template - wrap callback
             builder.AppendLine();
             builder.AppendLine("template <>");
-            builder.AppendLine("struct _marshal_helper<" + varTTo + ", " +varTFrom+">");
+            builder.AppendLine("struct _marshal_helper<" + varTTo + ", " + varTFrom + ">");
             builder.AppendLine("{");
             builder.AppendLine("\tinline static " + varTTo + " marshal(" + varCallback + ")");
             builder.AppendLine("\t{");
@@ -213,7 +213,7 @@ namespace CppCliBridgeGenerator
                 else // everything else
                 {
                     // add to output
-                    parList.Add(parTypeTransl.NativeType + " " + parameter.Name);
+                    parList.Add(parTypeTransl.NativeTypeForParam + " " + parameter.Name);
                 }
             }
         }

@@ -83,11 +83,11 @@ namespace CppCliBridgeGenerator
 
             foreach (var ctor in ctors)
             {
-                if (ctor.DeclaringType != type) continue; // INFO: skip inherited methods - could be controlled via checkbox
+                if (ctor.ReflectedType != type) continue; // INFO: skip inherited methods - could be controlled via checkbox
 
                 nodeType.Nodes.Add(new TreeNode()
                 {
-                    Text = ctor.DeclaringType.Name
+                    Text = ctor.ReflectedType.Name
                            + "("
                            + string.Join(", ", ctor.GetParameters().Select(par => par.ParameterType.Name + " " + par.Name).ToArray())
                            + ")",
@@ -125,9 +125,9 @@ namespace CppCliBridgeGenerator
 
             foreach (var method in methods)
             {
-                if (method.DeclaringType != type) continue; // INFO: skip inherited methods - could be controlled via checkbox
+                if (method.DeclaringType != type && (method.Name != "Dispose" || method.IsFinal)) continue; // INFO: skip inherited methods except dispose - could be controlled via checkbox
                 if (method.IsGenericMethod) continue; // INFO: skip generic methods - not possible   
-                if (method.IsSpecialName && method.DeclaringType.GetProperties().FirstOrDefault(p => p.GetSetMethod() == method) == null) continue; // INFO: skip event handlers (but leave property methods) - not supported ATM, but easily implementable 
+                if (method.IsSpecialName && method.ReflectedType.GetProperties().FirstOrDefault(p => p.GetSetMethod() == method || p.GetGetMethod() == method) == null) continue; // INFO: skip event handlers (but leave property methods) - not supported ATM, but easily implementable 
                 if (typeof(MulticastDelegate).IsAssignableFrom(method.ReturnType)) continue; // INFO: skip methods returning delegate - not supported ATM, but easily implementable 
                 if (method.GetParameters().Any(p => p.IsOut)) continue; // INFO: skip out parameters - can be anyhow universally solved? 
 

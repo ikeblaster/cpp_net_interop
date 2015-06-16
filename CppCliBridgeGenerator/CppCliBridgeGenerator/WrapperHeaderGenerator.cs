@@ -203,7 +203,7 @@ namespace CppCliBridgeGenerator
 
             GenerateDocComment(this.xmlDoc.GetDocDomment(ctor), builder); // add documentation comment for constructor
             builder.Append("\t\t");
-            builder.Append(Utils.GetWrapperTypeNameFor(ctor.DeclaringType) + "("); // method name
+            builder.Append(Utils.GetWrapperTypeNameFor(ctor.ReflectedType) + "("); // method name
             builder.Append(string.Join(", ", parList)); // parameters
             builder.AppendLine(");");
         }
@@ -240,13 +240,16 @@ namespace CppCliBridgeGenerator
                 GenerateWrapperDeclaration(typeTransl.ManagedType, this.outHeader);
             }
 
+            // find available method names
+            var methodNameSuffix = WrapperSourceGenerator.GetFieldMethodSuffix(field);
+
             // GETTER
             {
                 GenerateDocComment(this.xmlDoc.GetDocDomment(field), builder);
                 builder.Append("\t\t");
 
                 if (field.IsStatic) builder.Append("static "); // static keyword
-                builder.AppendLine(typeTransl.NativeType + " get_" + field.Name + "();");
+                builder.AppendLine(typeTransl.NativeType + " Get" + methodNameSuffix + "();");
             }
 
             // SETTER
@@ -257,7 +260,8 @@ namespace CppCliBridgeGenerator
                 builder.Append("\t\t");
 
                 if (field.IsStatic) builder.Append("static "); // static keyword
-                builder.AppendLine("void set_" + field.Name + "(" + typeTransl.NativeType + " value);");
+
+                builder.AppendLine("void Set" + methodNameSuffix + "(" + typeTransl.NativeTypeForParam + " value);");
             }
         }
 
@@ -297,11 +301,14 @@ namespace CppCliBridgeGenerator
             var parList = new List<string>();
             GenerateParametersList(method.GetParameters(), ref parList);
 
+            var methodName = WrapperSourceGenerator.GetPropertyMethodName(method);
+
+
             GenerateDocComment(this.xmlDoc.GetDocDomment(method), builder);
             builder.Append("\t\t");
 
             if (method.IsStatic) builder.Append("static "); // static keyword
-            builder.Append(returnTypeTransl.NativeType + " " + method.Name + "("); // method name
+            builder.Append(returnTypeTransl.NativeType + " " + methodName + "("); // method name
             builder.Append(string.Join(", ", parList));
             builder.AppendLine(");");
         }
@@ -350,7 +357,7 @@ namespace CppCliBridgeGenerator
                     }
 
                     // add to output
-                    parList.Add(parTypeTransl.NativeType + " " + parName);
+                    parList.Add(parTypeTransl.NativeTypeForParam + " " + parName);
                 }
             }
         }

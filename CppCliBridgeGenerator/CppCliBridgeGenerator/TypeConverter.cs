@@ -69,6 +69,15 @@ namespace CppCliBridgeGenerator
                 get { return this._nativeType; }
             }
 
+            public string NativeTypeForParam
+            {
+                get
+                {
+                    if (this.IsMarshalingRequired && !this.IsILObject) return "const " + this.NativeType + "&";
+                    return this.NativeType;
+                }
+            }
+
             public string ILBridgeType
             {
                 get { return this._ilbridgeType; }
@@ -134,7 +143,7 @@ namespace CppCliBridgeGenerator
             translations.Add(new TypeTranslation(typeof(bool), "bool"));
             translations.Add(new TypeTranslation(typeof(string), "std::wstring", TFlags.MarshalingRequired));
             translations.Add(new TypeTranslation(typeof(void), "void"));
-            // INFO: More translations (decimal?)
+            // INFO: add more translations (decimal?)
 
             foreach (TypeTranslation translation in translations)
             {

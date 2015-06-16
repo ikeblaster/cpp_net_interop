@@ -121,7 +121,7 @@ namespace CppCliBridgeGenerator
             var parList = new List<string>();
             GenerateParametersList(ctor.GetParameters(), ref parList);
 
-            var className = Utils.GetWrapperTypeNameFor(ctor.DeclaringType); // bridge class name
+            var className = Utils.GetWrapperTypeNameFor(ctor.ReflectedType); // bridge class name
 
             // signature
             builder.AppendLine(className + "::" + className + "(" + string.Join(", ", parList) + ") {");
@@ -132,8 +132,8 @@ namespace CppCliBridgeGenerator
                 GenerateMarshalParameter(parameter.Name, parameter.ParameterType, builder); // translate/marshal parameters
             }
 
-            builder.AppendLine("\t__IL = new " + Utils.GetWrapperILBridgeTypeNameFor(ctor.DeclaringType) + ";"); // create IL bridge instance
-            builder.Append("\t__IL->__Impl = gcnew " + Utils.GetCppCliTypeFullNameFor(ctor.DeclaringType) + "("); // create instance of managed object
+            builder.AppendLine("\t__IL = new " + Utils.GetWrapperILBridgeTypeNameFor(ctor.ReflectedType) + ";"); // create IL bridge instance
+            builder.Append("\t__IL->__Impl = gcnew " + Utils.GetCppCliTypeFullNameFor(ctor.ReflectedType) + "("); // create instance of managed object
             builder.Append(string.Join(", ", ctor.GetParameters().Select(par => Utils.GetLocalTempNameFor(par)))); // with parameters
             builder.AppendLine(");");
 
@@ -173,18 +173,21 @@ namespace CppCliBridgeGenerator
                 GenerateIlBridgeInclude(typeTransl.ManagedType, this.outHeader);
             }
 
+            // find available method names
+            var methodNameSuffix = GetFieldMethodSuffix(field);
+
             // GETTER
             {
                 // signature
-                builder.AppendLine(typeTransl.NativeType + " " + Utils.GetWrapperTypeNameFor(field.DeclaringType) + "::get_" + field.Name + "() {");
+                builder.AppendLine(typeTransl.NativeType + " " + Utils.GetWrapperTypeNameFor(field.ReflectedType) + "::Get" + methodNameSuffix + "() {");
 
                 // body
                 builder.Append("\t");
                 builder.Append(Utils.GetCppCliTypeFor(field.FieldType) + " " + Utils.GetLocalTempNameForReturn() + " = ");
 
                 if (field.IsStatic)
-                    builder.Append(Utils.GetCppCliTypeFullNameFor(field.DeclaringType) + "::");
-                else if (field.DeclaringType != null && field.DeclaringType.IsValueType && field.DeclaringType.IsLayoutSequential && false) // INFO: value structs disabled ATM!  
+                    builder.Append(Utils.GetCppCliTypeFullNameFor(field.ReflectedType) + "::");
+                else if (field.ReflectedType != null && field.ReflectedType.IsValueType && field.ReflectedType.IsLayoutSequential && false) // INFO: value structs disabled ATM!  
                     builder.Append("__IL->__Impl.");
                 else
                     builder.Append("__IL->__Impl->");
@@ -203,7 +206,7 @@ namespace CppCliBridgeGenerator
                 builder.AppendLine();
 
                 // signature
-                builder.AppendLine("void " + Utils.GetWrapperTypeNameFor(field.DeclaringType) + "::set_" + field.Name + "(" + typeTransl.NativeType + " value) {");
+                builder.AppendLine("void " + Utils.GetWrapperTypeNameFor(field.ReflectedType) + "::Set" + methodNameSuffix + "(" + typeTransl.NativeTypeForParam + " value) {");
 
                 // body
                 GenerateMarshalParameter("value", field.FieldType, builder);
@@ -211,8 +214,8 @@ namespace CppCliBridgeGenerator
                 builder.Append("\t");
 
                 if (field.IsStatic)
-                    builder.Append(Utils.GetCppCliTypeFullNameFor(field.DeclaringType) + "::");
-                else if (field.DeclaringType != null && field.DeclaringType.IsValueType && field.DeclaringType.IsLayoutSequential && false) // INFO: value structs disabled ATM! 
+                    builder.Append(Utils.GetCppCliTypeFullNameFor(field.ReflectedType) + "::");
+                else if (field.ReflectedType != null && field.ReflectedType.IsValueType && field.ReflectedType.IsLayoutSequential && false) // INFO: value structs disabled ATM! 
                     builder.Append("__IL->__Impl.");
                 else
                     builder.Append("__IL->__Impl->");
@@ -278,10 +281,11 @@ namespace CppCliBridgeGenerator
         /// <param name="builder">Output StringBuilder.</param>
         private void GenerateMethod_Signature(MethodInfo method, ref TypeConverter.TypeTranslation retValTransl, StringBuilder builder)
         {
-            var parList = new List<string>();
+            var parList = new List<string>();  
+            var methodName = GetPropertyMethodName(method);
 
             // method name
-            builder.Append(retValTransl.NativeType + " " + Utils.GetWrapperTypeNameFor(method.DeclaringType) + "::" + method.Name + "(");
+            builder.Append(retValTransl.NativeType + " " + Utils.GetWrapperTypeNameFor(method.ReflectedType) + "::" + methodName + "(");
 
             // parameters
             GenerateParametersList(method.GetParameters(), ref parList);
@@ -289,6 +293,7 @@ namespace CppCliBridgeGenerator
             builder.Append(string.Join(", ", parList));
             builder.Append(") ");
         }
+
 
         /// <summary>
         /// Method - marshal/translate parameters.
@@ -320,7 +325,7 @@ namespace CppCliBridgeGenerator
 
             // call prefix
             if (method.IsStatic)
-                builder.Append(Utils.GetCppCliTypeFullNameFor(method.DeclaringType) + "::");
+                builder.Append(Utils.GetCppCliTypeFullNameFor(method.ReflectedType) + "::");
             else
                 builder.Append("__IL->__Impl->");
 
@@ -339,8 +344,8 @@ namespace CppCliBridgeGenerator
             // or get/set according field (for properties)
             else
             {
-                var property = method.DeclaringType.GetProperties().FirstOrDefault(p => p.GetSetMethod() == method);
-                if (property == null) return;
+                var property = method.ReflectedType.GetProperties().FirstOrDefault(p => p.GetSetMethod() == method || p.GetGetMethod() == method);
+                if (property == null) throw new Exception("Couldn't find property.");
 
                 builder.Append(property.Name);
                 if (method.GetParameters().Length == 1) builder.Append(" = " + Utils.GetLocalTempNameFor(method.GetParameters().First()));
@@ -393,7 +398,7 @@ namespace CppCliBridgeGenerator
                 else // everything else
                 {
                     // add to output
-                    parList.Add(parTypeTransl.NativeType + " " + parName);
+                    parList.Add(parTypeTransl.NativeTypeForParam + " " + parName);
                 }
             }
         }

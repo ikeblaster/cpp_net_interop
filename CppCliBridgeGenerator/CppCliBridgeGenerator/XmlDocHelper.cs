@@ -43,18 +43,18 @@ namespace CppCliBridgeGenerator
         /// <returns>Documentation comment or empty string.</returns>
         public string GetDocDomment(MethodInfo method)
         {
-            if (method == null || method.DeclaringType == null) return "";
+            if (method == null || method.ReflectedType == null) return "";
 
             // properties
             if (method.IsSpecialName)
             {
-                var property = method.DeclaringType.GetProperties().FirstOrDefault(p => p.GetSetMethod() == method);
+                var property = method.ReflectedType.GetProperties().FirstOrDefault(p => p.GetSetMethod() == method || p.GetGetMethod() == method);
                 if (property == null) return "";
-                return GetDocCommentFor("P:" + method.DeclaringType.FullName + "." + property.Name);
+                return GetDocCommentFor("P:" + method.ReflectedType.FullName + "." + property.Name);
             }
 
             // methods
-            return GetDocCommentFor("M:" + method.DeclaringType.FullName + "." + method.Name + GetParameters(method.GetParameters()));  
+            return GetDocCommentFor("M:" + method.ReflectedType.FullName + "." + method.Name + GetParameters(method.GetParameters()));  
         }
 
         /// <summary>
@@ -64,8 +64,8 @@ namespace CppCliBridgeGenerator
         /// <returns>Documentation comment or empty string.</returns>
         public string GetDocDomment(ConstructorInfo ctor)
         {
-            if (ctor == null || ctor.DeclaringType == null) return "";
-            return GetDocCommentFor("M:" + ctor.DeclaringType.FullName + ".#ctor" + GetParameters(ctor.GetParameters()));
+            if (ctor == null || ctor.ReflectedType == null) return "";
+            return GetDocCommentFor("M:" + ctor.ReflectedType.FullName + ".#ctor" + GetParameters(ctor.GetParameters()));
         }
 
         /// <summary>
@@ -75,8 +75,8 @@ namespace CppCliBridgeGenerator
         /// <returns>Documentation comment or empty string.</returns>
         public string GetDocDomment(FieldInfo field)
         {
-            if (field == null || field.DeclaringType == null) return "";
-            return GetDocCommentFor("F:" + field.DeclaringType.FullName + field.Name);
+            if (field == null || field.ReflectedType == null) return "";
+            return GetDocCommentFor("F:" + field.ReflectedType.FullName + field.Name);
         }
 
         /// <summary>
