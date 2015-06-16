@@ -324,8 +324,13 @@ namespace CppCliBridgeGenerator
             else
                 builder.Append("__IL->__Impl->");
 
+            // invoke destructor
+            if (method.ReflectedType != null && method.Name == "Dispose")
+            {
+                builder.AppendLine("~" + method.ReflectedType.Name + "();");
+            }   
             // call managed method itself
-            if (!method.IsSpecialName || method.DeclaringType == null)
+            else if (method.ReflectedType == null || !method.IsSpecialName)
             {
                 builder.Append(method.Name + "(");
                 builder.Append(string.Join(", ", method.GetParameters().Select(par => Utils.GetLocalTempNameFor(par)))); // pass parameters
