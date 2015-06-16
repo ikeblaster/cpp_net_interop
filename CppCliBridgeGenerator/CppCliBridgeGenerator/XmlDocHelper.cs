@@ -117,7 +117,7 @@ namespace CppCliBridgeGenerator
             // add parameters to outstr
             foreach (ParameterInfo parameterInfo in parameters)
             {
-                if (outstr.Length > 0) outstr += ",";
+                if (outstr.Length > 1) outstr += ",";
                 outstr += parameterInfo.ParameterType.FullName;
             }
 
