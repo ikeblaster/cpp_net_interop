@@ -98,9 +98,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\marshaller_ext_old.h" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Resources\marshaller_ext.h" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
