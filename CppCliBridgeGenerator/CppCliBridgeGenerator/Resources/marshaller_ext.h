@@ -168,7 +168,7 @@ template <typename TTo, typename TFrom> inline TTo marshal_as(cli::array<TFrom,2
 
 
 /// std::vector<> -> cli::array<> 
-template<typename TTo, typename TFrom> inline cli::array<TTo>^ marshal_as_1d(std::vector<TFrom> const from)
+template<typename TTo, typename TFrom> inline cli::array<TTo>^ marshal_as_1d(const std::vector<TFrom>& from)
 {
     size_t len = from.size();
     cli::array<TTo>^ __ReturnVal = gcnew cli::array<TTo>(len);
@@ -181,7 +181,7 @@ template<typename TTo, typename TFrom> inline cli::array<TTo>^ marshal_as_1d(std
 }
 
 /// std::vector<std::vector<>> -> cli::array<,2> 
-template <typename TTo, typename TFrom> inline cli::array<TTo,2>^ marshal_as_2d(std::vector<std::vector<TFrom>> const from)
+template <typename TTo, typename TFrom> inline cli::array<TTo,2>^ marshal_as_2d(const std::vector<std::vector<TFrom>>& from)
 {
     size_t len = from.size();
     size_t len2 = len > 0 ? from[0].size() : 0;
@@ -235,7 +235,7 @@ template <typename TTo, typename TFrom> inline TTo marshal_as(System::Collection
 
 
 /// std::vector<> -> ICollection<>
-template <typename TTo, typename TFrom> inline TTo marshal_as_clr(std::vector<TFrom> const from)
+template <typename TTo, typename TFrom> inline TTo marshal_as_clr(const std::vector<TFrom>& from)
 {
     typedef remove_hat<TTo>::type TTo2;
     
