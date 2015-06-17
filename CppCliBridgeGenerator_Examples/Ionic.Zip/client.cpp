@@ -12,7 +12,7 @@ int main()
     
     ZipFile *zip = new ZipFile();
 
-    zip->AddFile(L"marshaller_ext.h");
+    zip->AddFile(L"Ionic.Zip.dll");
  
     zip->Save(L"out.zip");
     

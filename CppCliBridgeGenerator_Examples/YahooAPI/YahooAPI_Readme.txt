@@ -9,6 +9,10 @@ It is fully usable in generator as it is (you can check everything and press Gen
 `client.cpp` is an example of using generated bridge.
 
 
+`Steps` contains 4 subfolders with different "states" of example during generation or compiling.
+
+
+
 
 
 

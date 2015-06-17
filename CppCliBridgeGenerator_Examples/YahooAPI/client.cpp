@@ -5,7 +5,7 @@
 using namespace std;
 using namespace Wrapper;
  
-void PrintCB(wstring str) {
+void PrintCB(const wstring& str) {
     wcout << L"Callback: " << str << endl << endl;
 }
  

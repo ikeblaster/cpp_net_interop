@@ -15,6 +15,10 @@ You need to generate and compile a bridge with at least following methods:
 
 
 
+`Steps` contains 4 subfolders with different "states" of example during generation or compiling.
+
+
+
 
 
 
