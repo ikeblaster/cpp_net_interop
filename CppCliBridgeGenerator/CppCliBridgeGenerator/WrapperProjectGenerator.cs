@@ -98,7 +98,11 @@ namespace CppCliBridgeGenerator
             builder.AppendLine(@"  </ItemGroup>
   <ItemGroup>");
 
+
+
             // add references to assemblies
+            var referenced = new HashSet<AssemblyName>();
+            
             foreach (var assembly in this.loadedAssemblies)
             {
                 if (assembly.ManifestModule.Name == "mscorlib.dll") continue;
@@ -107,7 +111,27 @@ namespace CppCliBridgeGenerator
       <HintPath>{1}</HintPath>
     </Reference>", assembly.FullName, assembly.ManifestModule.Name);
                 builder.AppendLine();
+
+                referenced.Add(assembly.GetName());
             }
+
+            foreach (var assembly in this.loadedAssemblies)
+            {
+                if (assembly.ManifestModule.Name == "mscorlib.dll") continue;
+
+                foreach (var refr in assembly.GetReferencedAssemblies())
+                {
+                    if (refr.Name == "mscorlib" || refr.Name == "System") continue; // should be always present, when using .net assembly
+                    if (referenced.Contains(refr)) continue;
+                    referenced.Add(refr);
+
+                    builder.AppendFormat(@"    <Reference Include=""{0}"" />", refr.FullName);
+                    builder.AppendLine();                    
+                }
+
+            }
+
+
 
             builder.AppendLine(@"  </ItemGroup>
   <Import Project=""$(VCTargetsPath)\Microsoft.Cpp.Targets"" />
