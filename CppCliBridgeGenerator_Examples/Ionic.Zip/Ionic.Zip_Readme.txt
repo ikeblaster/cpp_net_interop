@@ -1,26 +1,40 @@
 "DotNetZip is a FAST, FREE class library and toolset for manipulating zip files." (official website)
 
+
 You should be able to generate and compile bridge for everything in this library.
 
 Official website of library: http://dotnetzip.codeplex.com/
 
-
-
+-----------------------------------------------------------------------------------------------------------
 
 `client.cpp` is a very simple example of using generated bridge. 
 Its purpose is to create a zip file called "out.zip" containing a file "client.cpp".
 
+
 You need to generate and compile a bridge with at least following methods: 
-  ZipFile(), AddFile(String fileName), Save(String fileName)
+
+    ZipFile()
+    AddFile(String fileName)
+    Save(String fileName)
+
+
+`_client_compile.bat` is prepared script for compiling `client.cpp`, but to make it work
+you have to put these files next to it:
+
+    client.cpp
+    Ionic.Zip.dll
+    Wrapper_Ionic_Zip_ZipFile.h         (generated header file)
+    Wrapper.dll, Wrapper.lib            (compiled wrapper)
 
 
 
-`Steps` contains 4 subfolders with different "states" of example during generation or compiling.
+
+`Steps` contains 4 subfolders with different "states" of example during generation or compiling, 
+including compiled version of client.cpp.
+
+-----------------------------------------------------------------------------------------------------------
+
+Please examine sources and don't be afraid to play around.
 
 
-
-
-
-
-
-   2015-06-06, Ike Blaster
+    2015-06-06, Ike Blaster
