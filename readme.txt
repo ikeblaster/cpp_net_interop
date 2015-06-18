@@ -15,10 +15,12 @@ Popis sloek:
 
   CppCliBridgeGenerator_Examples/ 
       – Adresáø obsahující pøipravené pøíklady pouitelné pro otestování funkènosti nástroje.
-      - V podadresáøích se nachází readme soubor k jednotlivım pøíkladùm (anglicky).
+      - V podadresáøích se vdy nachází readme soubor k jednotlivım pøíkladùm (anglicky).
 
   CppCliBridgeGenerator_PerformanceTests/ 
-      – Adresáø obsahující nástroje v podobì pouité pro testování funkènosti v kapitole 7. 
+      – Adresáø obsahující nástroje v podobì pouité pro testování funkènosti v kapitole 7.
+      - Testy nejsou plnì automatizované - jednotlivé metody je nutné ruènì mìnit v kódu.
+      - Mìøení èasu je zahrnuto v "run" skriptech (vyuívá PowerShell).
 
   CppCliBridgeGenerator_Release/ 
       – Adresáø obsahující spouštìcí soubor nástroje (tj. zkompilovanı projekt z první zmínìné sloky).
@@ -31,9 +33,9 @@ Popis sloek:
 Popis souborù:
 ==============
 
-  Kinkor_A12B0082P_BP.pdf 
-      – Text bakaláøské práce ve formátu PDF.
-      - Obsahuje uivatelskou pøíruèku nástroje (pøíloha A, strana 39). 
+  Kinkor_A12B0082P_BP.pdf / Kinkor_A12B0082P_BP.docx 
+      – Text bakaláøské práce ve formátu PDF a DOCX.
+      - Obsahuje uivatelskou pøíruèku nástroje (pøíloha A, strana 44 v PDF/39 èíslovaná). 
 
   readme.txt 
       – Tento soubor.
